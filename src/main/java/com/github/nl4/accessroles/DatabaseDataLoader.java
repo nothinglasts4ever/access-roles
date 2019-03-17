@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Component
 public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedEvent> {
@@ -31,29 +32,62 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        Person person = Person.builder()
+        Person rick = Person.builder()
                 .firstName("Rick")
                 .lastName("Sanchez")
                 .gender(Gender.MALE)
                 .birthday(LocalDate.now().minusYears(70))
                 .build();
-        personRepository.save(person);
-        personRepository.findAll().forEach(System.out::println);
+        Person morty = Person.builder()
+                .firstName("Morty")
+                .lastName("Smith")
+                .gender(Gender.MALE)
+                .birthday(LocalDate.now().minusYears(14))
+                .build();
+        Person summer = Person.builder()
+                .firstName("Summer")
+                .lastName("Smith")
+                .gender(Gender.FEMALE)
+                .birthday(LocalDate.now().minusYears(17))
+                .build();
+        Person beth = Person.builder()
+                .firstName("Beth")
+                .lastName("Smith")
+                .gender(Gender.FEMALE)
+                .birthday(LocalDate.now().minusYears(34))
+                .build();
+        Person jerry = Person.builder()
+                .firstName("Jerry")
+                .lastName("Smith")
+                .gender(Gender.MALE)
+                .birthday(LocalDate.now().minusYears(34))
+                .build();
+        personRepository.saveAll(Arrays.asList(rick, morty, summer, jerry, beth));
 
-        Location location = Location.builder()
+        Location gazor = Location.builder()
                 .name("Gazorpazorp")
                 .build();
-        locationRepository.save(location);
-        locationRepository.findAll().forEach(System.out::println);
-
-        AccessRole accessRole = AccessRole.builder()
-                .person(person)
-                .location(location)
-                .start(LocalDateTime.now())
-                .end(LocalDateTime.now().plusWeeks(3))
+        Location cronen = Location.builder()
+                .name("Cronenberg World")
                 .build();
-        accessRoleRepository.save(accessRole);
-        accessRoleRepository.findAll().forEach(System.out::println);
+        Location earth = Location.builder()
+                .name("Earth")
+                .build();
+        Location pluto = Location.builder()
+                .name("Pluto")
+                .build();
+        locationRepository.saveAll(Arrays.asList(gazor, cronen, earth, pluto));
+
+        accessRoleRepository.save(AccessRole.builder().person(rick).location(earth).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(30)).build());
+        accessRoleRepository.save(AccessRole.builder().person(rick).location(gazor).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(10)).build());
+        accessRoleRepository.save(AccessRole.builder().person(rick).location(pluto).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(3)).build());
+        accessRoleRepository.save(AccessRole.builder().person(rick).location(cronen).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(7)).build());
+        accessRoleRepository.save(AccessRole.builder().person(morty).location(earth).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(70)).build());
+        accessRoleRepository.save(AccessRole.builder().person(morty).location(gazor).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(10)).build());
+        accessRoleRepository.save(AccessRole.builder().person(summer).location(earth).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(70)).build());
+        accessRoleRepository.save(AccessRole.builder().person(beth).location(earth).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(50)).build());
+        accessRoleRepository.save(AccessRole.builder().person(jerry).location(earth).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(50)).build());
+        accessRoleRepository.save(AccessRole.builder().person(jerry).location(pluto).start(LocalDateTime.now()).end(LocalDateTime.now().plusYears(100)).build());
     }
 
 }
