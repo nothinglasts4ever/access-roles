@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  access-roles-mysql:
+    container_name: access-roles-mysql
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3308:3306
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: mysecret
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: access_roles
+    volumes:
+      - ./data/access-roles-mysql:/var/lib/mysql
+
+  access-roles:
+    container_name: access-roles
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - access-roles-mysql
+    environment:
+      - DATABASE_HOST=access-roles-mysql
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=access_roles
+      - DATABASE_PORT=3306
+    volumes:
+      - ./data/access-roles-app
