@@ -39,7 +39,7 @@ public class PersonService {
     }
 
     public void deletePerson(Long id) {
-        Person person = getPerson(id);
+        var person = getPerson(id);
         personRepository.delete(person);
     }
 

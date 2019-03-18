@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 
 @RestController
 @RequestMapping("/access-roles")
@@ -23,20 +22,20 @@ public class AccessRoleController {
 
     @GetMapping
     public ResponseEntity<Iterable<AccessRole>> allAccessRoles() {
-        Iterable<AccessRole> accessRoles = accessRolesService.allRoles();
+        var accessRoles = accessRolesService.allRoles();
         return ResponseEntity.ok(accessRoles);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<AccessRole> getAccessRole(@PathVariable Long id) {
-        AccessRole accessRoles = accessRolesService.getAccessRole(id);
+        var accessRoles = accessRolesService.getAccessRole(id);
         return ResponseEntity.ok(accessRoles);
     }
 
     @PostMapping
     public ResponseEntity<Void> createAccessRole(@RequestBody AccessRole accessRoles, HttpServletRequest request) {
-        AccessRole createdAccessRole = accessRolesService.createAccessRole(accessRoles);
-        URI uri = ServletUriComponentsBuilder
+        var createdAccessRole = accessRolesService.createAccessRole(accessRoles);
+        var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/access-roles/{id}")
                 .buildAndExpand(createdAccessRole.getId())

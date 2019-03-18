@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 
 @RestController
 @RequestMapping("/persons")
@@ -23,20 +22,20 @@ public class PersonController {
 
     @GetMapping
     public ResponseEntity<Iterable<Person>> allPersons() {
-        Iterable<Person> persons = personService.allPersons();
+        var persons = personService.allPersons();
         return ResponseEntity.ok(persons);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Person> getPerson(@PathVariable Long id) {
-        Person person = personService.getPerson(id);
+        var person = personService.getPerson(id);
         return ResponseEntity.ok(person);
     }
 
     @PostMapping
     public ResponseEntity<Void> createPerson(@RequestBody Person person, HttpServletRequest request) {
-        Person createdPerson = personService.createPerson(person);
-        URI uri = ServletUriComponentsBuilder
+        var createdPerson = personService.createPerson(person);
+        var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/persons/{id}")
                 .buildAndExpand(createdPerson.getId())

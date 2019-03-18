@@ -39,7 +39,7 @@ public class AccessRoleService {
     }
 
     public void deleteAccessRole(Long id) {
-        AccessRole accessRole = getAccessRole(id);
+        var accessRole = getAccessRole(id);
         accessRoleRepository.delete(accessRole);
     }
 

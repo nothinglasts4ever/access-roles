@@ -33,13 +33,13 @@ public class LocationService {
     }
 
     public Location updateLocation(Location location, Long id) {
-        Location dbLocation = getLocation(id);
+        var dbLocation = getLocation(id);
         dbLocation.setName(location.getName());
         return locationRepository.save(dbLocation);
     }
 
     public void deleteLocation(Long id) {
-        Location location = getLocation(id);
+        var location = getLocation(id);
         locationRepository.delete(location);
     }
 

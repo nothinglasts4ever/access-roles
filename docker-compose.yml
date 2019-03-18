@@ -10,10 +10,10 @@ services:
     expose:
       - 3306
     environment:
-      MYSQL_ROOT_PASSWORD: mysecret
+      MYSQL_DATABASE: access_roles
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: access_roles
+      MYSQL_ROOT_PASSWORD: mysecret
     volumes:
       - ./data/access-roles-mysql:/var/lib/mysql
 
@@ -28,9 +28,9 @@ services:
       - access-roles-mysql
     environment:
       - DATABASE_HOST=access-roles-mysql
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=access_roles
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
-      - DATABASE_NAME=access_roles
-      - DATABASE_PORT=3306
     volumes:
       - ./data/access-roles-app

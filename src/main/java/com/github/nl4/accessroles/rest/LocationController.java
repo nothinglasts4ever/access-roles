@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 
 @RestController
 @RequestMapping("/locations")
@@ -23,20 +22,20 @@ public class LocationController {
 
     @GetMapping
     public ResponseEntity<Iterable<Location>> allLocations() {
-        Iterable<Location> locations = locationService.allLocations();
+        var locations = locationService.allLocations();
         return ResponseEntity.ok(locations);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Location> getLocation(@PathVariable Long id) {
-        Location location = locationService.getLocation(id);
+        var location = locationService.getLocation(id);
         return ResponseEntity.ok(location);
     }
 
     @PostMapping
     public ResponseEntity<Void> createLocation(@RequestBody Location location, HttpServletRequest request) {
-        Location createdLocation = locationService.createLocation(location);
-        URI uri = ServletUriComponentsBuilder
+        var createdLocation = locationService.createLocation(location);
+        var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/locations/{id}")
                 .buildAndExpand(createdLocation.getId())
