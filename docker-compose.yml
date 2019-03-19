@@ -1,6 +1,20 @@
 version: '3.7'
 
 services:
+  service-discovery:
+    container_name: service-discovery
+    hostname: service-discovery
+    build:
+      context: .
+      dockerfile: Dockerfile.eureka
+    ports:
+      - 8761:8761
+    expose:
+      - 8761
+    volumes:
+      - ./data/service-discovery
+    restart: on-failure
+
   access-roles-mysql:
     container_name: access-roles-mysql
     image: mysql:latest
@@ -16,15 +30,17 @@ services:
       MYSQL_ROOT_PASSWORD: mysecret
     volumes:
       - ./data/access-roles-mysql:/var/lib/mysql
+    restart: on-failure
 
   access-roles:
     container_name: access-roles
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.access-roles
     ports:
       - 8080:8080
     depends_on:
+      - service-discovery
       - access-roles-mysql
     environment:
       - DATABASE_HOST=access-roles-mysql
@@ -34,3 +50,6 @@ services:
       - DATABASE_PASSWORD=password
     volumes:
       - ./data/access-roles-app
+    restart: on-failure
+    links:
+      - service-discovery
