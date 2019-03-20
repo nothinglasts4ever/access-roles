@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.nl4.access-roles</groupId>
-    <artifactId>app</artifactId>
+    <artifactId>persons</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>access-roles</name>
-    <description>Access Roles App</description>
+    <name>persons</name>
+    <description>Access Roles Persons Service</description>
 
     <properties>
         <java.version>12</java.version>

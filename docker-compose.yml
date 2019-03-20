@@ -32,6 +32,28 @@ services:
       - ./data/access-roles-mysql:/var/lib/mysql
     restart: on-failure
 
+  persons:
+    container_name: persons
+    build:
+      context: .
+      dockerfile: Dockerfile.persons
+    ports:
+      - 8090:8080
+    depends_on:
+      - service-discovery
+      - access-roles-mysql
+    environment:
+      - DATABASE_HOST=access-roles-mysql
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=access_roles
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=password
+    volumes:
+      - ./data/persons
+    restart: on-failure
+    links:
+      - service-discovery
+
   access-roles:
     container_name: access-roles
     build:
@@ -42,6 +64,7 @@ services:
     depends_on:
       - service-discovery
       - access-roles-mysql
+      - persons
     environment:
       - DATABASE_HOST=access-roles-mysql
       - DATABASE_PORT=3306

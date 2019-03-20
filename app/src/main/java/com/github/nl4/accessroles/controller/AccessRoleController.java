@@ -1,4 +1,4 @@
-package com.github.nl4.accessroles.rest;
+package com.github.nl4.accessroles.controller;
 
 import com.github.nl4.accessroles.domain.AccessRole;
 import com.github.nl4.accessroles.service.AccessRoleService;

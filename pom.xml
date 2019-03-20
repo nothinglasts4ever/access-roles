@@ -10,6 +10,8 @@
 
     <modules>
         <module>eureka</module>
+        <module>common</module>
+        <module>persons</module>
         <module>app</module>
     </modules>
 

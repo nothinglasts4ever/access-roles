@@ -1,6 +1,6 @@
 package com.github.nl4.accessroles.domain;
 
-import com.github.nl4.accessroles.data.Gender;
+import com.github.nl4.accessroles.common.data.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
