@@ -1,4 +1,4 @@
 FROM openjdk:13-alpine
 VOLUME ./data/access-roles-app
-COPY app/target/*.jar app.jar
+COPY access-roles-app/target/*.jar app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
