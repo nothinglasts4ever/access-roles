@@ -1,5 +1,7 @@
 db_parameters: useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow&createDatabaseIfNotExist=true
 
+server:
+  port: 8090
 spring:
   application:
     name: persons
@@ -8,6 +10,7 @@ spring:
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
   jpa:
     properties:
       hibernate:
@@ -21,3 +24,13 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://service-discovery:8761/eureka
+    fetchRegistry: true
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+
+logging.level.com.github.nl4.accessroles.client.AccessRolesClient: DEBUG

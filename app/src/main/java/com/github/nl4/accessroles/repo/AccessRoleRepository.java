@@ -4,4 +4,6 @@ import com.github.nl4.accessroles.domain.AccessRole;
 import org.springframework.data.repository.CrudRepository;
 
 public interface AccessRoleRepository extends CrudRepository<AccessRole, Long> {
+    void deleteAccessRolesByLocation_Id(Long locationId);
+    void deleteAccessRolesByPersonId(Long personId);
 }

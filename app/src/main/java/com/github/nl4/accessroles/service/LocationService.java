@@ -1,6 +1,7 @@
 package com.github.nl4.accessroles.service;
 
 import com.github.nl4.accessroles.domain.Location;
+import com.github.nl4.accessroles.repo.AccessRoleRepository;
 import com.github.nl4.accessroles.repo.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,12 @@ import javax.transaction.Transactional;
 public class LocationService {
 
     private final LocationRepository locationRepository;
+    private final AccessRoleRepository accessRoleRepository;
 
     @Autowired
-    public LocationService(LocationRepository locationRepository) {
+    public LocationService(LocationRepository locationRepository, AccessRoleRepository accessRoleRepository) {
         this.locationRepository = locationRepository;
+        this.accessRoleRepository = accessRoleRepository;
     }
 
     public Iterable<Location> allLocations() {
@@ -40,6 +43,7 @@ public class LocationService {
 
     public void deleteLocation(Long id) {
         var location = getLocation(id);
+        accessRoleRepository.deleteAccessRolesByLocation_Id(id);
         locationRepository.delete(location);
     }
 
