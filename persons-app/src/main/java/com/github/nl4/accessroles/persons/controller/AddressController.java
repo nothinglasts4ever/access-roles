@@ -23,9 +23,9 @@ public class AddressController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<Address>> allAddresss() {
-        var addresss = addressService.allAddresss();
-        return ResponseEntity.ok(addresss);
+    public ResponseEntity<Iterable<Address>> allAddresses() {
+        var addresses = addressService.allAddresses();
+        return ResponseEntity.ok(addresses);
     }
 
     @GetMapping(value = "/{id}")

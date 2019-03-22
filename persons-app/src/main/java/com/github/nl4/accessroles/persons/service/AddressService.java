@@ -19,7 +19,7 @@ public class AddressService {
         this.addressRepository = addressRepository;
     }
 
-    public Iterable<Address> allAddresss() {
+    public Iterable<Address> allAddresses() {
         return addressRepository.findAll();
     }
 
