@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Data
@@ -24,4 +25,7 @@ public class Person implements Serializable {
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
     private LocalDate birthday;
+    @ManyToMany
+    @JoinTable(inverseJoinColumns = {@JoinColumn(name = "address_id")})
+    private Set<Address> addresses;
 }
