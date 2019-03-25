@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "access-roles-app")
 public interface AccessRolesClient {
     @RequestMapping(method = RequestMethod.DELETE, value = "/access-roles")
-    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam Long personId);
+    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam String personId);
 }

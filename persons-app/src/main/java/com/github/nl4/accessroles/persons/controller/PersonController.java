@@ -32,7 +32,7 @@ public class PersonController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable Long id) {
+    public ResponseEntity<Person> getPerson(@PathVariable String id) {
         var person = personService.getPerson(id);
         return ResponseEntity.ok(person);
     }
@@ -50,14 +50,14 @@ public class PersonController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Void> updatePerson(@PathVariable Long id, @RequestBody Person person) {
+    public ResponseEntity<Void> updatePerson(@PathVariable String id, @RequestBody Person person) {
         personService.updatePerson(person, id);
         log.info("Person with id [" + id + "] updated");
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePerson(@PathVariable String id) {
         personService.deletePerson(id);
         accessRolesClient.deleteAccessRolesForPerson(id);
         log.info("Person with id [" + id + "] removed");

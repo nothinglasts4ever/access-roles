@@ -43,7 +43,7 @@ public class AccessRoleService {
         accessRoleRepository.delete(accessRole);
     }
 
-    public void deleteAccessRolesForPerson(Long personId) {
+    public void deleteAccessRolesForPerson(String personId) {
         accessRoleRepository.deleteAccessRolesByPersonId(personId);
     }
 

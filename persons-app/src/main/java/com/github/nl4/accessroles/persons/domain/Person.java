@@ -5,27 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Entity
+@Document
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Person implements Serializable {
+public class Person {
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
     private String firstName;
     private String lastName;
-    @Enumerated(EnumType.ORDINAL)
     private Gender gender;
     private LocalDate birthday;
-    @ManyToMany
-    @JoinTable(inverseJoinColumns = {@JoinColumn(name = "address_id")})
     private Set<Address> addresses;
 }

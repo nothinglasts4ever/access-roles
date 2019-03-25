@@ -18,7 +18,7 @@ public class AccessRole implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    private Long personId;
+    private String personId;
     @ManyToOne
     private Location location;
     private LocalDateTime start;

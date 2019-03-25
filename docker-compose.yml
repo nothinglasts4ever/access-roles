@@ -12,24 +12,22 @@ services:
     expose:
       - 8761
     volumes:
-      - ./data/service-discovery
+      - /tmp/access-roles/service-discovery
     restart: on-failure
 
-  persons-mysql:
-    container_name: persons-mysql
-    image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
+  persons-mongo:
+    container_name: persons-mongo
+    image: mongo:4.0.7-xenial
     ports:
-      - 3309:3306
+      - 27017:27017
     expose:
-      - 3306
+      - 27017
     environment:
-      MYSQL_DATABASE: persons
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: mysecret
+      - MONGO_INITDB_DATABASE=persons
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
-      - ./data/persons-mysql:/var/lib/mysql
+      - /tmp/access-roles/persons-mongo
     restart: on-failure
 
   persons-app:
@@ -41,22 +39,22 @@ services:
       - 8090:8090
     depends_on:
       - service-discovery
-      - persons-mysql
+      - persons-mongo
     environment:
-      - DATABASE_HOST=persons-mysql
-      - DATABASE_PORT=3306
+      - DATABASE_HOST=persons-mongo
+      - DATABASE_PORT=27017
       - DATABASE_NAME=persons
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - ./data/persons
+      - /tmp/access-roles/persons
     restart: on-failure
     links:
       - service-discovery
 
   access-roles-mysql:
     container_name: access-roles-mysql
-    image: mysql:latest
+    image: mysql:8.0.15
     command: --default-authentication-plugin=mysql_native_password
     ports:
       - 3308:3306
@@ -68,7 +66,7 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: mysecret
     volumes:
-      - ./data/access-roles-mysql:/var/lib/mysql
+      - /tmp/access-roles/access-roles-mysql:/var/lib/mysql
     restart: on-failure
 
   access-roles-app:
@@ -88,7 +86,7 @@ services:
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - ./data/access-roles-app
+      - /tmp/access-roles//access-roles-app
     restart: on-failure
     links:
       - service-discovery

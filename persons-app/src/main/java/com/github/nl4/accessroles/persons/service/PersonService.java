@@ -23,7 +23,7 @@ public class PersonService {
         return personRepository.findAll();
     }
 
-    public Person getPerson(Long id) {
+    public Person getPerson(String id) {
         return personRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find person with id [" + id + "]"));
     }
@@ -32,13 +32,13 @@ public class PersonService {
         return personRepository.save(person);
     }
 
-    public Person updatePerson(Person person, Long id) {
+    public Person updatePerson(Person person, String id) {
         getPerson(id);
         person.setId(id);
         return personRepository.save(person);
     }
 
-    public void deletePerson(Long id) {
+    public void deletePerson(String id) {
         var person = getPerson(id);
         personRepository.delete(person);
     }
