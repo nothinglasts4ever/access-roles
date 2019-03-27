@@ -35,7 +35,6 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(70))
                 .addresses(Set.of(address1, address2))
                 .build();
-        personRepository.save(rick);
         Person morty = Person.builder()
                 .id("2")
                 .firstName("Morty")
@@ -44,7 +43,6 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(14))
                 .addresses(Set.of(address2))
                 .build();
-        personRepository.save(morty);
         Person summer = Person.builder()
                 .id("3")
                 .firstName("Summer")
@@ -53,7 +51,6 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(17))
                 .addresses(Set.of(address2))
                 .build();
-        personRepository.save(summer);
         Person beth = Person.builder()
                 .id("4")
                 .firstName("Beth")
@@ -62,7 +59,6 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(34))
                 .addresses(Set.of(address2))
                 .build();
-        personRepository.save(beth);
         Person jerry = Person.builder()
                 .id("5")
                 .firstName("Jerry")
@@ -71,7 +67,7 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(34))
                 .addresses(Set.of(address3, address2))
                 .build();
-        personRepository.save(jerry);
+        personRepository.saveAll(Set.of(rick, morty, summer, beth, jerry)).subscribe();
     }
 
 }

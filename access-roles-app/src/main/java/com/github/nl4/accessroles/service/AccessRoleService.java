@@ -2,6 +2,7 @@ package com.github.nl4.accessroles.service;
 
 import com.github.nl4.accessroles.domain.AccessRole;
 import com.github.nl4.accessroles.repo.AccessRoleRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 public class AccessRoleService {
 
     private final AccessRoleRepository accessRoleRepository;
@@ -44,7 +46,10 @@ public class AccessRoleService {
     }
 
     public void deleteAccessRolesForPerson(String personId) {
-        accessRoleRepository.deleteAccessRolesByPersonId(personId);
+        if (accessRoleRepository.countByPersonId(personId) > 0) {
+            accessRoleRepository.deleteAccessRolesByPersonId(personId);
+            log.info("Access roles for person with id [" + personId + "] removed");
+        }
     }
 
 }

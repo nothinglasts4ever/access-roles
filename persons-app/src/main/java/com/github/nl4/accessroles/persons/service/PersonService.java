@@ -4,12 +4,10 @@ import com.github.nl4.accessroles.persons.domain.Person;
 import com.github.nl4.accessroles.persons.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
-@Transactional
 public class PersonService {
 
     private final PersonRepository personRepository;
@@ -19,28 +17,25 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public Iterable<Person> allPersons() {
+    public Flux<Person> getAllPersons() {
         return personRepository.findAll();
     }
 
-    public Person getPerson(String id) {
-        return personRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cannot find person with id [" + id + "]"));
+    public Mono<Person> getPerson(String id) {
+        return personRepository.findById(id);
     }
 
-    public Person createPerson(Person person) {
+    public Mono<Person> createPerson(Person person) {
         return personRepository.save(person);
     }
 
-    public Person updatePerson(Person person, String id) {
-        getPerson(id);
+    public Mono<Person> updatePerson(Person person, String id) {
         person.setId(id);
         return personRepository.save(person);
     }
 
-    public void deletePerson(String id) {
-        var person = getPerson(id);
-        personRepository.delete(person);
+    public Mono<Void> deletePerson(String id) {
+        return personRepository.deleteById(id);
     }
 
 }

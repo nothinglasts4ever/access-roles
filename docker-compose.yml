@@ -5,14 +5,14 @@ services:
     container_name: service-discovery
     hostname: service-discovery
     build:
-      context: .
-      dockerfile: Dockerfile.eureka
+      context: eureka
+      dockerfile: Dockerfile
     ports:
       - 8761:8761
     expose:
       - 8761
     volumes:
-      - /tmp/access-roles/service-discovery
+      - /tmp/access-roles/service-discovery:/app
     restart: on-failure
 
   persons-mongo:
@@ -27,14 +27,15 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
-      - /tmp/access-roles/persons-mongo
+      - /tmp/access-roles/persons-mongo:/data/db
+      - /tmp/access-roles/persons-mongo/config:/data/configdb
     restart: on-failure
 
   persons-app:
     container_name: persons-app
     build:
-      context: .
-      dockerfile: Dockerfile.persons
+      context: persons-app
+      dockerfile: Dockerfile
     ports:
       - 8090:8090
     depends_on:
@@ -47,7 +48,7 @@ services:
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - /tmp/access-roles/persons
+      - /tmp/access-roles/persons-app:/tmp/access-roles/persons-app
     restart: on-failure
     links:
       - service-discovery
@@ -72,8 +73,8 @@ services:
   access-roles-app:
     container_name: access-roles-app
     build:
-      context: .
-      dockerfile: Dockerfile.access-roles
+      context: access-roles-app
+      dockerfile: Dockerfile
     ports:
       - 8080:8080
     depends_on:
@@ -86,7 +87,7 @@ services:
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - /tmp/access-roles//access-roles-app
+      - /tmp/access-roles/access-roles-app:/app
     restart: on-failure
     links:
       - service-discovery

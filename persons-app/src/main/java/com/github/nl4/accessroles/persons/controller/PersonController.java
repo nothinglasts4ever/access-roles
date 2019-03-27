@@ -5,11 +5,11 @@ import com.github.nl4.accessroles.persons.domain.Person;
 import com.github.nl4.accessroles.persons.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.servlet.http.HttpServletRequest;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/persons")
@@ -26,42 +26,48 @@ public class PersonController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<Person>> allPersons() {
-        var persons = personService.allPersons();
-        return ResponseEntity.ok(persons);
+    public Flux<Person> getAllPersons() {
+        return personService.getAllPersons();
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable String id) {
-        var person = personService.getPerson(id);
-        return ResponseEntity.ok(person);
+    public Mono<ResponseEntity<Person>> getPerson(@PathVariable String id) {
+        return personService.getPerson(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Void> createPerson(@RequestBody Person person, HttpServletRequest request) {
-        var createdPerson = personService.createPerson(person);
-        var uri = ServletUriComponentsBuilder
-                .fromContextPath(request)
-                .path("/persons/{id}")
-                .buildAndExpand(createdPerson.getId())
-                .toUri();
-        log.info("Person created: " + uri);
-        return ResponseEntity.created(uri).build();
+    public Mono<ResponseEntity<Person>> createPerson(@RequestBody Person person) {
+        return personService.createPerson(person)
+                .map(p -> {
+                    log.info("Person with id [" + p.getId() + "] created");
+                    return new ResponseEntity<>(p, HttpStatus.CREATED);
+                })
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Void> updatePerson(@PathVariable String id, @RequestBody Person person) {
-        personService.updatePerson(person, id);
-        log.info("Person with id [" + id + "] updated");
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Person>> updatePerson(@PathVariable String id, @RequestBody Person person) {
+        return personService.getPerson(id)
+                .map(p -> {
+                    personService.updatePerson(person, id);
+                    log.info("Person with id [" + id + "] updated");
+                    return ResponseEntity.ok(person);
+                })
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable String id) {
-        personService.deletePerson(id);
-        accessRolesClient.deleteAccessRolesForPerson(id);
-        log.info("Person with id [" + id + "] removed");
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Void>> deletePerson(@PathVariable String id) {
+        Mono<Void> deletePerson = personService.deletePerson(id);
+        Mono<ResponseEntity<Void>> deleteRoles = Mono.just(accessRolesClient.deleteAccessRolesForPerson(id));
+        return personService.getPerson(id)
+                .flatMap(person -> Mono.zip(deletePerson, deleteRoles)
+                        .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK)))
+                        .doOnNext(x -> log.info("Person with id [" + id + "] removed"))
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
 }

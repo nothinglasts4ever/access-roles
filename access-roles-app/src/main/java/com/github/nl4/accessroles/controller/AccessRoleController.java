@@ -63,7 +63,6 @@ public class AccessRoleController {
     @DeleteMapping
     public ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam String personId) {
         accessRolesService.deleteAccessRolesForPerson(personId);
-        log.info("Access roles for person with id [" + personId + "] removed");
         return ResponseEntity.noContent().build();
     }
 
