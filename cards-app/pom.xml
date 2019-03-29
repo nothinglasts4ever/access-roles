@@ -9,10 +9,10 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>persons-app</artifactId>
+    <artifactId>cards-app</artifactId>
     <packaging>jar</packaging>
-    <name>persons-app</name>
-    <description>Owl Persons and Addresses Service</description>
+    <name>cards-app</name>
+    <description>Owl Cards Service</description>
 
     <dependencies>
         <dependency>
