@@ -1,6 +1,6 @@
-package com.github.nl4.accessroles.repo;
+package com.github.nl4.accessroles.roles.repo;
 
-import com.github.nl4.accessroles.domain.AccessRole;
+import com.github.nl4.accessroles.roles.domain.AccessRole;
 import org.springframework.data.repository.CrudRepository;
 
 public interface AccessRoleRepository extends CrudRepository<AccessRole, Long> {

@@ -1,4 +1,4 @@
-package com.github.nl4.accessroles.domain;
+package com.github.nl4.accessroles.roles.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

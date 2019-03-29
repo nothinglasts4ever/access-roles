@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.nl4.access-roles</groupId>
+        <groupId>com.github.nl4.owl</groupId>
         <artifactId>parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -12,7 +12,7 @@
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
     <name>common</name>
-    <description>Common classes</description>
+    <description>Owl common classes</description>
 
     <dependencies>
         <dependency>

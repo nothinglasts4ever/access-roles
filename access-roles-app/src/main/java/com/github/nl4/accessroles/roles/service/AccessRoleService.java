@@ -1,7 +1,7 @@
-package com.github.nl4.accessroles.service;
+package com.github.nl4.accessroles.roles.service;
 
-import com.github.nl4.accessroles.domain.AccessRole;
-import com.github.nl4.accessroles.repo.AccessRoleRepository;
+import com.github.nl4.accessroles.roles.domain.AccessRole;
+import com.github.nl4.accessroles.roles.repo.AccessRoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

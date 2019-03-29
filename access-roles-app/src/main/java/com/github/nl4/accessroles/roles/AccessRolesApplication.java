@@ -1,10 +1,10 @@
-package com.github.nl4.accessroles;
+package com.github.nl4.accessroles.roles;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.github.nl4.accessroles.roles", "com.github.nl4.accessroles.common"})
 @EnableDiscoveryClient
 public class AccessRolesApplication {
 

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.nl4.access-roles</groupId>
+        <groupId>com.github.nl4.owl</groupId>
         <artifactId>parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -12,7 +12,7 @@
     <artifactId>eureka</artifactId>
     <packaging>jar</packaging>
     <name>eureka</name>
-    <description>Access Roles Service Discovery</description>
+    <description>Owl Service Discovery</description>
 
     <dependencies>
         <dependency>

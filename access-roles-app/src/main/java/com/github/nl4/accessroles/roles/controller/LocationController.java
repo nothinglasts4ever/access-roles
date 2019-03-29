@@ -1,7 +1,7 @@
-package com.github.nl4.accessroles.controller;
+package com.github.nl4.accessroles.roles.controller;
 
-import com.github.nl4.accessroles.domain.Location;
-import com.github.nl4.accessroles.service.LocationService;
+import com.github.nl4.accessroles.roles.domain.Location;
+import com.github.nl4.accessroles.roles.service.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

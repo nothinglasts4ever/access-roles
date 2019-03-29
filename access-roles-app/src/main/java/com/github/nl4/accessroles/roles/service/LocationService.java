@@ -1,8 +1,8 @@
-package com.github.nl4.accessroles.service;
+package com.github.nl4.accessroles.roles.service;
 
-import com.github.nl4.accessroles.domain.Location;
-import com.github.nl4.accessroles.repo.AccessRoleRepository;
-import com.github.nl4.accessroles.repo.LocationRepository;
+import com.github.nl4.accessroles.roles.domain.Location;
+import com.github.nl4.accessroles.roles.repo.AccessRoleRepository;
+import com.github.nl4.accessroles.roles.repo.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

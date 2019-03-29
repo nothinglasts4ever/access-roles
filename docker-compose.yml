@@ -12,7 +12,7 @@ services:
     expose:
       - 8761
     volumes:
-      - /tmp/access-roles/service-discovery:/app
+      - /tmp/owl/service-discovery:/app
     restart: on-failure
 
   persons-mongo:
@@ -27,8 +27,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
-      - /tmp/access-roles/persons-mongo:/data/db
-      - /tmp/access-roles/persons-mongo/config:/data/configdb
+      - /tmp/owl/persons-mongo:/data/db
+      - /tmp/owl/persons-mongo/config:/data/configdb
     restart: on-failure
 
   persons-app:
@@ -48,7 +48,7 @@ services:
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - /tmp/access-roles/persons-app:/tmp/access-roles/persons-app
+      - /tmp/owl/persons-app:/tmp/access-roles/persons-app
     restart: on-failure
     links:
       - service-discovery
@@ -67,7 +67,7 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: mysecret
     volumes:
-      - /tmp/access-roles/access-roles-mysql:/var/lib/mysql
+      - /tmp/owl/access-roles-mysql:/var/lib/mysql
     restart: on-failure
 
   access-roles-app:
@@ -87,7 +87,7 @@ services:
       - DATABASE_USER=user
       - DATABASE_PASSWORD=password
     volumes:
-      - /tmp/access-roles/access-roles-app:/app
+      - /tmp/owl/access-roles-app:/app
     restart: on-failure
     links:
       - service-discovery

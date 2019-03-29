@@ -8,10 +8,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication(scanBasePackages = {"com.github.nl4.accessroles.persons", "com.github.nl4.accessroles.common"})
 @EnableDiscoveryClient
 @EnableFeignClients
-public class PersonsService {
+public class PersonsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PersonsService.class, args);
+        SpringApplication.run(PersonsApplication.class, args);
     }
 
 }
