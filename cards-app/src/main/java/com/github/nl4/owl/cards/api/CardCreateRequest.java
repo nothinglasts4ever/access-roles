@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Data
@@ -15,8 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CardCreateRequest {
-    @NotNull
     private PersonInfo personInfo;
-    @NotNull
     private Set<AccessRoleInfo> accessRoles;
 }

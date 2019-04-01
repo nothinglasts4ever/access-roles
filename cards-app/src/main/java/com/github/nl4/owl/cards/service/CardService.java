@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.ValidationException;
 import java.util.Set;
 
 @Service
@@ -31,6 +32,12 @@ public class CardService {
     }
 
     public Mono<Card> createCard(PersonInfo personInfo, Set<AccessRoleInfo> accessRoles) {
+        if (personInfo.getPersonId() == null) {
+            throw new ValidationException("Person id is not specified");
+        }
+        if (accessRoles == null || accessRoles.size() == 0) {
+            throw new ValidationException("Person has no active access roles");
+        }
         var card = Card.builder()
                 .personInfo(personInfo)
                 .accessRoles(accessRoles)
