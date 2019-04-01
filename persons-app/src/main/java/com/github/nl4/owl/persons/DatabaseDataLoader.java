@@ -24,10 +24,10 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        Address address1 = Address.builder().city("Black").street("41st Street").building(234).apartment(2342).build();
-        Address address2 = Address.builder().city("Yellow").street("32nd Street").building(123).apartment(9876).build();
-        Address address3 = Address.builder().city("Red").street("23rd Street").building(456).apartment(1).build();
-        Person rick = Person.builder()
+        var address1 = Address.builder().city("Black").street("41st Street").building(234).apartment(2342).build();
+        var address2 = Address.builder().city("Yellow").street("32nd Street").building(123).apartment(9876).build();
+        var address3 = Address.builder().city("Red").street("23rd Street").building(456).apartment(1).build();
+        var rick = Person.builder()
                 .id("1")
                 .firstName("Rick")
                 .lastName("Sanchez")
@@ -35,7 +35,7 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(70))
                 .addresses(Set.of(address1, address2))
                 .build();
-        Person morty = Person.builder()
+        var morty = Person.builder()
                 .id("2")
                 .firstName("Morty")
                 .lastName("Smith")
@@ -43,7 +43,7 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(14))
                 .addresses(Set.of(address2))
                 .build();
-        Person summer = Person.builder()
+        var summer = Person.builder()
                 .id("3")
                 .firstName("Summer")
                 .lastName("Smith")
@@ -51,7 +51,7 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(17))
                 .addresses(Set.of(address2))
                 .build();
-        Person beth = Person.builder()
+        var beth = Person.builder()
                 .id("4")
                 .firstName("Beth")
                 .lastName("Smith")
@@ -59,7 +59,7 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .birthday(LocalDate.now().minusYears(34))
                 .addresses(Set.of(address2))
                 .build();
-        Person jerry = Person.builder()
+        var jerry = Person.builder()
                 .id("5")
                 .firstName("Jerry")
                 .lastName("Smith")

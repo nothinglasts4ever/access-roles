@@ -3,6 +3,8 @@ db_parameters: useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&u
 spring:
   application:
     name: access-roles-app
+  jackson:
+    default-property-inclusion: non_null
   datasource:
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?${db_parameters}
     username: ${DATABASE_USER}

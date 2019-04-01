@@ -5,6 +5,8 @@ server:
 spring:
   application:
     name: persons-app
+  jackson:
+    default-property-inclusion: non_null
   data:
     mongodb:
       uri: mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?${db_parameters}
