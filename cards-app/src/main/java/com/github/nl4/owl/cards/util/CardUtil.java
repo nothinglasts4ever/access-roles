@@ -10,6 +10,9 @@ import java.util.StringJoiner;
 public class CardUtil {
 
     public static String generateBarcode(PersonInfo personInfo, Set<AccessRoleInfo> accessRoles) {
+        if (personInfo == null || accessRoles == null || accessRoles.isEmpty()) {
+            return Base64.getEncoder().encodeToString("0".getBytes());
+        }
         StringJoiner string = new StringJoiner(":")
                 .add(personInfo.getPersonId())
                 .add(String.valueOf(accessRoles.size()));

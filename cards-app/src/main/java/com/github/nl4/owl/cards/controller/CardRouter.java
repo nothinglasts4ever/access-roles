@@ -10,13 +10,13 @@ public class CardRouter {
 
     @Bean
     public RouterFunction<ServerResponse> route(CardHandler cardHandler) {
-        RequestPredicate get = RequestPredicates.GET("/cards/{id}")
+        var get = RequestPredicates.GET("/cards/{id}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        RequestPredicate getAll = RequestPredicates.GET("/cards")
+        var getAll = RequestPredicates.GET("/cards")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
-        RequestPredicate post = RequestPredicates.POST("/cards")
+        var post = RequestPredicates.POST("/cards")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON))
                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON));
 

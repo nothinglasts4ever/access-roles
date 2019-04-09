@@ -29,9 +29,9 @@ public class CardHandler {
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
-        final String id = request.pathVariable("id");
-        final Mono<Card> card = cardService.getCard(id);
-        final Mono<ServerResponse> successResponse = ServerResponse.ok()
+        var id = request.pathVariable("id");
+        var card = cardService.getCard(id);
+        var successResponse = ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromPublisher(card, Card.class));
         return card
@@ -40,10 +40,12 @@ public class CardHandler {
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
-        final Mono<CardCreateRequest> cardRequest = request.bodyToMono(CardCreateRequest.class);
-        return ServerResponse.created(UriComponentsBuilder.fromPath("cards/" + "id").build().toUri())
+        var location = UriComponentsBuilder.fromPath("cards/" + "id").build().toUri();
+        var cardRequest = request.bodyToMono(CardCreateRequest.class)
+                .flatMap(c -> cardService.createCard(c.getPersonInfo(), c.getAccessRoles()));
+        return ServerResponse.created(location)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(cardRequest.flatMap(c -> cardService.createCard(c.getPersonInfo(), c.getAccessRoles())), Card.class));
+                .body(BodyInserters.fromPublisher(cardRequest, Card.class));
     }
 
 }
