@@ -2,6 +2,7 @@ db_parameters: authSource=admin&authMechanism=SCRAM-SHA-1
 
 server:
   port: 8090
+
 spring:
   application:
     name: persons-app
@@ -12,11 +13,13 @@ spring:
       uri: mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?${db_parameters}
   datasource:
     initialization-mode: always
+
 eureka:
   client:
     serviceUrl:
       defaultZone: http://service-discovery:8761/eureka
     fetchRegistry: true
+
 feign:
   client:
     config:

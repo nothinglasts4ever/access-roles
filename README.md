@@ -1,10 +1,17 @@
 # Owl
 Pet (that's whyl owl) project to play with microservices infrastructure built using Spring Boot
 
-      ,_,
-     (O,O)
-     (   )
-    --"-"--
+        .-"""""""-.    .'""."".""`.
+       /   \ * /   \  /  ^ \   /^  \
+      { ((@)\*/((@) }.{ ~Q '\ / Q ~}}
+     ( `.~~ .V. ~~.'}.`._.'  V`._.'  )
+     ( ( `-')  `-'  }   ~~     ~~    )
+     (  (   ) ^ ^   0 "  " "   (  (   )
+     (      )  ^^  00   "      (      .)
+     ( (   )     ^ 00     "    ( (   ) )
+      {   )  ^^   .0'0  "   "   (     }
+       { }  ^   ))    0          (   }
+        `--www--'       "--mmm------ "
 
 ## To do list
 - [x] Simple *domain model* using **Spring Data** and **Lombok**
@@ -16,15 +23,40 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
 - [x] Refactor one service to use **MongoDB** and **Spring Reactive WebFlux**
 - [x] Add new microservice with WebFlux controller in *functional style*
 - [x] *Unit tests* using **Groovy Spock**
-- [ ] Implement *CQRS* for one microservise
-- [ ] Communicate between microservices using **Kafka**
-- [ ] Communicate between microservices using **RabbitMQ**
+- [x] Add *API gateway* service
 - [ ] Implement *authentication* (probably add **Redis**)
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
+- [ ] Communicate between microservices using **Kafka** and/or **RabbitMQ**
+- [ ] Implement *CQRS* for one microservice
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
 - [ ] Refactor one microservice with **Kotlin**
-- [ ] Add new microservices using **Golang**
+- [ ] Add new microservice using **Golang**
+
+## Architecture
+```
+                ,_,                ,_,
+               (^,^)              (^,^)
+               (   )              (   )
+              --"-"--            --"-"--
+            Gateway API     Service Discovery
+  
+       ,_,                ,_,                ,_,  
+      (.,.)              (O,O)              (-,-)  
+      (   )              (   )              (   )
+     --"-"--            --"-"--            --"-"--         
+Access Roles App      Persons App         Cards App
+
+        |                  |                  |
+        
+       _.-,               /|\                /|\  
+   .--'  '-._            / |/\              / |/\ 
+ _/`-  _      '.        | \|.'|            | \|.'|
+'----'._`.----. \       \'.|/ /            \'.|/ /
+        `     \;         '.|.'              '.|.' 
+      MySQL   ;_\       MongoDb            MongoDb
+
+```
 
 ## Details
 ### Simple domain model using Spring Data and Lombok
@@ -152,6 +184,35 @@ public interface AccessRolesClient {
 }
 ```
 ### Refactor one service to use MongoDB and Spring Reactive WebFlux
+```java
+@Document
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Person {
+    @Id
+    private String id;
+    private String firstName;
+    private String lastName;
+    private Gender gender;
+    private LocalDate birthday;
+    private Set<Address> addresses;
+}
+```
+```java
+@Document
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Address {
+    private String city;
+    private String street;
+    private int building;
+    private int apartment;
+}
+```
 ```java
 public interface PersonRepository extends ReactiveMongoRepository<Person, String> {
 }

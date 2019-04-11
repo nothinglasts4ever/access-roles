@@ -36,8 +36,6 @@ services:
     build:
       context: persons-app
       dockerfile: Dockerfile
-    ports:
-      - 8090:8090
     depends_on:
       - service-discovery
       - persons-mongo
@@ -75,8 +73,6 @@ services:
     build:
       context: access-roles-app
       dockerfile: Dockerfile
-    ports:
-      - 8080:8080
     depends_on:
       - service-discovery
       - access-roles-mysql
@@ -113,8 +109,6 @@ services:
     build:
       context: cards-app
       dockerfile: Dockerfile
-    ports:
-      - 8091:8091
     depends_on:
       - service-discovery
       - cards-mongo
@@ -126,6 +120,21 @@ services:
       - DATABASE_PASSWORD=password
     volumes:
       - /tmp/owl/cards-app:/app
+    restart: on-failure
+    links:
+      - service-discovery
+
+  gateway-api:
+    container_name: gateway-api
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    volumes:
+      - /tmp/owl/gateway-api:/app
     restart: on-failure
     links:
       - service-discovery

@@ -1,5 +1,8 @@
 db_parameters: useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow&createDatabaseIfNotExist=true
 
+server:
+  port: 8092
+
 spring:
   application:
     name: access-roles-app
@@ -20,6 +23,7 @@ spring:
 #        format_sql: true
     hibernate:
       ddl-auto: create
+
 eureka:
   client:
     serviceUrl:
