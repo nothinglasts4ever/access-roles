@@ -4,36 +4,26 @@ server:
 spring:
   application:
     name: gateway-api
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: access-roles-app
-          uri: lb://access-roles-app
-          predicates:
-            - Path=/access-roles/**
-          filters:
-            - RewritePath=/access-roles/(?<path>.*), /$\{path}
-        - id: locations-app
-          uri: lb://access-roles-app
-          predicates:
-            - Path=/locations/**
-          filters:
-            - RewritePath=/locations/(?<path>.*), /$\{path}
-        - id: persons-app
-          uri: lb://persons-app
-          predicates:
-            - Path=/persons/**
-          filters:
-            - RewritePath=/persons/(?<path>.*), /$\{path}
-        - id: cards-app
-          uri: lb://cards-app
-          predicates:
-            - Path=/cards/**
-          filters:
-            - RewritePath=/cards/(?<path>.*), /$\{path}
+
+zuul:
+  ignoredServices: '*'
+  routes:
+    access-roles-app:
+      path: /access-roles/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    locations-app:
+      path: /locations/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    persons-app:
+      path: /persons/**
+      serviceId: persons-app
+      stripPrefix: false
+    cards-app:
+      path: /cards/**
+      serviceId: cards-app
+      stripPrefix: false
 
 eureka:
   client:

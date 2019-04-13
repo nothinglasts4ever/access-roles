@@ -13,6 +13,20 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
        { }  ^   ))    0          (   }
         `--www--'       "--mmm------ "
 
+## Stack
+* Java 12 and Lombok
+* Spring Boot 2
+* Spring Data
+* Spring MVC and Spring WebFlux
+* Eureka
+* Zuul
+* Feign
+* MySQL and MongoDB
+* Groovy and Spock
+* Maven
+* Docker with docker-compose
+* Git
+
 ## To do list
 - [x] Simple *domain model* using **Spring Data** and **Lombok**
 - [x] **Spring MVC** *REST* controller
@@ -23,7 +37,7 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
 - [x] Refactor one service to use **MongoDB** and **Spring Reactive WebFlux**
 - [x] Add new microservice with WebFlux controller in *functional style*
 - [x] *Unit tests* using **Groovy Spock**
-- [x] Add *API gateway* service
+- [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
 - [ ] Implement *authentication* (probably add **Redis**)
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
@@ -123,7 +137,7 @@ FROM openjdk:13-alpine
 COPY target/*.jar app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ```
-```
+```yaml
   access-roles-mysql:
     container_name: access-roles-mysql
     image: mysql:8.0.15
@@ -164,7 +178,7 @@ public class ServiceDiscoveryApplication {
     }
 }
 ```
-```
+```yaml
 spring:
   application:
     name: service-discovery
@@ -339,4 +353,59 @@ class CardUtilTest extends Specification {
     }
 
 }
+```
+### Add API gateway service using Spring Cloud Gateway
+```yaml
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: access-roles-app
+          uri: lb://access-roles-app
+          predicates:
+            - Path=/access-roles/**
+          filters:
+            - RewritePath=/access-roles/(?<path>.*), /$\{path}
+        - id: locations-app
+          uri: lb://access-roles-app
+          predicates:
+            - Path=/locations/**
+          filters:
+            - RewritePath=/locations/(?<path>.*), /$\{path}
+        - id: persons-app
+          uri: lb://persons-app
+          predicates:
+            - Path=/persons/**
+          filters:
+            - RewritePath=/persons/(?<path>.*), /$\{path}
+        - id: cards-app
+          uri: lb://cards-app
+          predicates:
+            - Path=/cards/**
+          filters:
+            - RewritePath=/cards/(?<path>.*), /$\{path}
+```
+### API gateway service using Zuul
+```yaml
+zuul:
+  ignoredServices: '*'
+  routes:
+    access-roles-app:
+      path: /access-roles/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    locations-app:
+      path: /locations/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    persons-app:
+      path: /persons/**
+      serviceId: persons-app
+      stripPrefix: false
+    cards-app:
+      path: /cards/**
+      serviceId: cards-app
+      stripPrefix: false
 ```
