@@ -1,5 +1,5 @@
 # Owl
-Pet (that's whyl owl) project to play with microservices infrastructure built using Spring Boot
+Pet (that's why owl) project to play with microservices infrastructure built using Spring Boot
 
         .-"""""""-.    .'""."".""`.
        /   \ * /   \  /  ^ \   /^  \
@@ -21,6 +21,7 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
 * Eureka
 * Zuul
 * Feign
+* JWT
 * MySQL and MongoDB
 * Groovy and Spock
 * Maven
@@ -38,7 +39,7 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
 - [x] Add new microservice with WebFlux controller in *functional style*
 - [x] *Unit tests* using **Groovy Spock**
 - [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
-- [ ] Implement *authentication* (probably add **Redis**)
+- [ ] Implement *authentication* using JSON Web Token (probably add **Redis**)
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
 - [ ] Communicate between microservices using **Kafka** and/or **RabbitMQ**
@@ -50,10 +51,10 @@ Pet (that's whyl owl) project to play with microservices infrastructure built us
 ## Architecture
 ```
                 ,_,                ,_,
-               (^,^)              (^,^)
+               (^,^) - H2         (^,^)
                (   )              (   )
               --"-"--            --"-"--
-            Gateway API     Service Discovery
+         Gateway API & Auth  Service Discovery
   
        ,_,                ,_,                ,_,  
       (.,.)              (O,O)              (-,-)  
@@ -408,4 +409,17 @@ zuul:
       path: /cards/**
       serviceId: cards-app
       stripPrefix: false
+```
+### Implement authentication using JSON Web Token
+```java
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.cors().and().csrf().disable().authorizeRequests()
+                .antMatchers("/login").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
 ```

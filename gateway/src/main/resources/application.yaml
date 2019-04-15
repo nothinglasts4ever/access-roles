@@ -4,6 +4,20 @@ server:
 spring:
   application:
     name: gateway-api
+  datasource:
+    url: jdbc:h2:mem:default
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        use_sql_comments: true
+#        format_sql: true
+  h2:
+    console:
+      enabled: true
 
 zuul:
   ignoredServices: '*'
