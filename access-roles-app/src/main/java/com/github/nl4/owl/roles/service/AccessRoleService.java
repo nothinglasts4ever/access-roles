@@ -1,55 +1,67 @@
 package com.github.nl4.owl.roles.service;
 
+import com.github.nl4.owl.roles.api.AccessRoleDto;
+import com.github.nl4.owl.roles.config.AccessRoleMapper;
 import com.github.nl4.owl.roles.domain.AccessRole;
 import com.github.nl4.owl.roles.repo.AccessRoleRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.UUID;
 
 @Service
-@Transactional
-@Slf4j
+@RequiredArgsConstructor
 public class AccessRoleService {
 
     private final AccessRoleRepository accessRoleRepository;
+    private final AccessRoleMapper mapper;
 
-    @Autowired
-    public AccessRoleService(AccessRoleRepository accessRoleRepository) {
-        this.accessRoleRepository = accessRoleRepository;
+    @Transactional(readOnly = true)
+    public Collection<AccessRoleDto> allRoles() {
+        return mapper.toAccessRoleDtoSet(accessRoleRepository.findAll());
     }
 
-    public Iterable<AccessRole> allRoles() {
-        return accessRoleRepository.findAll();
+    @Transactional(readOnly = true)
+    public AccessRoleDto getAccessRole(UUID id) {
+        return mapper.toAccessRoleDto(doGetAccessRole(id));
     }
 
-    public AccessRole getAccessRole(Long id) {
+    @Transactional
+    public AccessRoleDto createAccessRole(AccessRoleDto dto) {
+        var entity = mapper.toAccessRole(dto);
+        entity.setId(UUID.randomUUID());
+
+        return mapper.toAccessRoleDto(accessRoleRepository.save(entity));
+    }
+
+    @Transactional
+    public AccessRoleDto updateAccessRole(AccessRoleDto accessRole, UUID id) {
+        var dbAccessRole = doGetAccessRole(id);
+        dbAccessRole.setLocation(mapper.toLocation(accessRole.getLocation()));
+        dbAccessRole.setPersonId(accessRole.getPersonId());
+        dbAccessRole.setStart(accessRole.getStart());
+        dbAccessRole.setEnd(accessRole.getEnd());
+
+        return mapper.toAccessRoleDto(dbAccessRole);
+    }
+
+    @Transactional
+    public void deleteAccessRole(UUID id) {
+        doGetAccessRole(id);
+        accessRoleRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAccessRolesForPerson(String personId) {
+        accessRoleRepository.deleteAccessRolesByPersonId(personId);
+    }
+
+    private AccessRole doGetAccessRole(UUID id) {
         return accessRoleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find access role with id [" + id + "]"));
-    }
-
-    public AccessRole createAccessRole(AccessRole accessRole) {
-        return accessRoleRepository.save(accessRole);
-    }
-
-    public AccessRole updateAccessRole(AccessRole accessRole, Long id) {
-        getAccessRole(id);
-        accessRole.setId(id);
-        return accessRoleRepository.save(accessRole);
-    }
-
-    public void deleteAccessRole(Long id) {
-        var accessRole = getAccessRole(id);
-        accessRoleRepository.delete(accessRole);
-    }
-
-    public void deleteAccessRolesForPerson(String personId) {
-        if (accessRoleRepository.countByPersonId(personId) > 0) {
-            accessRoleRepository.deleteAccessRolesByPersonId(personId);
-            log.info("Access roles for person with id [" + personId + "] removed");
-        }
     }
 
 }

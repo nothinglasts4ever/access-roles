@@ -13,6 +13,8 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Credentials {
+
     private String login;
     private String password;
+
 }

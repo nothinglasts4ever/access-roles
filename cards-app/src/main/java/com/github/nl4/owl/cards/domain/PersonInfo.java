@@ -6,13 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Document
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PersonInfo {
-    private String personId;
+
+    private UUID personId;
     private String personName;
     private String personDetails;
+
 }

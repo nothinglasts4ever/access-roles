@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Document
 @Data
@@ -14,8 +15,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccessRoleInfo {
-    private Long accessRoleId;
-    private Long locationId;
+
+    private UUID accessRoleId;
+    private UUID locationId;
     private String locationName;
-    private LocalDateTime expiration;
+    private OffsetDateTime expiration;
+
 }

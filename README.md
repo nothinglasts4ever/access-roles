@@ -14,6 +14,13 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
         `--www--'       "--mmm------ "
 
 ## Stack
+**Note**
+>This project was created prior to my experience in microservice architecture
+>and uses frameworks and technologies that I decided to learn by that time.
+>
+>It does NOT use modern Spring Cloud stack, does NOT build around Kubernetes
+>and does NOT use ready Access Management solution like Keycloak.
+
 * Java 12 and Lombok
 * Spring Boot 2
 * Spring Data
@@ -28,7 +35,7 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 * Docker with docker-compose
 * Git
 
-## To do list
+## To Do List
 - [x] Simple *domain model* using **Spring Data** and **Lombok**
 - [x] **Spring MVC** *REST* controller
 - [x] Introduce **Docker** and put **MySQL** in separate container
@@ -39,14 +46,12 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 - [x] Add new microservice with WebFlux controller in *functional style*
 - [x] *Unit tests* using **Groovy Spock**
 - [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
-- [ ] Implement *authentication* using JSON Web Token (probably add **Redis**)
+- [x] Implement *authentication* using JSON Web Token
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
-- [ ] Communicate between microservices using **Kafka** and/or **RabbitMQ**
+- [ ] Communicate between microservices using **Kafka**
 - [ ] Implement *CQRS* for one microservice
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
-- [ ] Refactor one microservice with **Kotlin**
-- [ ] Add new microservice using **Golang**
 
 ## Architecture
 ```
@@ -73,28 +78,47 @@ Access Roles App      Persons App         Cards App
 
 ```
 
+## Domain Model
+* Persons App
+  * Contains information about persons and their addresses
+  * Addresses and persons can be added, modified or deleted
+* Access Roles App
+  * Contains locations and access roles associated with these locations
+  * Locations can be added, modified or deleted
+  * Persons can get access roles for dedicated locations
+* Cards App
+  * Contains cards that associated with access roles
+  * Cards can be generated for particular persons with access roles assigned to them
+  * Cards contain persons, locations and access roles information
+* Gateway App
+  * Uses API Gateway pattern to route requests to appropriate services
+  * Used for user authentication
+  * New users can be registered
+* Service Discovery App
+  * Used for service discovery
+
 ## Details
 ### Simple domain model using Spring Data and Lombok
 ```java
 @Entity
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AccessRole implements Serializable {
     @Id
-    @GeneratedValue
-    private Long id;
+    private UUID id;
+    @NotNull
     private String personId;
     @ManyToOne
+    @NotNull
     private Location location;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    @NotNull
+    private OffsetDateTime start;
+    @NotNull
+    private OffsetDateTime end;
     private String createdBy;
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }
 ```
 
@@ -102,31 +126,33 @@ public class AccessRole implements Serializable {
 ```java
 @RestController
 @RequestMapping("/access-roles")
+@RequiredArgsConstructor
 @Slf4j
 public class AccessRoleController {
 
     private final AccessRoleService accessRolesService;
 
-    @Autowired
-    public AccessRoleController(AccessRoleService accessRolesService) {
-        this.accessRolesService = accessRolesService;
+    @GetMapping
+    public ResponseEntity<Collection<AccessRoleDto>> allAccessRoles() {
+        var accessRoles = accessRolesService.allRoles();
+        return ResponseEntity.ok(accessRoles);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<AccessRole> getAccessRole(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<AccessRoleDto> getAccessRole(@PathVariable UUID id) {
         var accessRoles = accessRolesService.getAccessRole(id);
         return ResponseEntity.ok(accessRoles);
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAccessRole(@RequestBody AccessRole accessRoles, HttpServletRequest request) {
+    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleDto accessRoles, HttpServletRequest request) {
         var createdAccessRole = accessRolesService.createAccessRole(accessRoles);
         var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/access-roles/{id}")
                 .buildAndExpand(createdAccessRole.getId())
                 .toUri();
-        log.info("Access role created: " + uri);
+        log.info("Access role created: {}", uri);
         return ResponseEntity.created(uri).build();
     }
 
@@ -194,8 +220,8 @@ eureka:
 ```java
 @FeignClient(value = "access-roles-app")
 public interface AccessRolesClient {
-    @RequestMapping(method = RequestMethod.DELETE, value = "/access-roles")
-    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam String personId);
+    @DeleteMapping("/access-roles")
+    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam UUID personId);
 }
 ```
 ### Refactor one service to use MongoDB and Spring Reactive WebFlux
@@ -207,7 +233,7 @@ public interface AccessRolesClient {
 @NoArgsConstructor
 public class Person {
     @Id
-    private String id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private Gender gender;
@@ -229,15 +255,15 @@ public class Address {
 }
 ```
 ```java
-public interface PersonRepository extends ReactiveMongoRepository<Person, String> {
+public interface PersonRepository extends ReactiveMongoRepository<Person, UUID> {
 }
 ```
 ```java
     @PostMapping
-    public Mono<ResponseEntity<Person>> createPerson(@RequestBody Person person) {
+    public Mono<ResponseEntity<PersonDto>> createPerson(@RequestBody PersonDto person) {
         return personService.createPerson(person)
                 .map(p -> {
-                    log.info("Person with id [" + p.getId() + "] created");
+                    log.info("Person with id [{}] created", p.getId());
                     return new ResponseEntity<>(p, HttpStatus.CREATED);
                 })
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -267,39 +293,37 @@ public class CardRouter {
 ```
 ```java
 @Component
+@RequiredArgsConstructor
 public class CardHandler {
 
     private final CardService cardService;
 
-    @Autowired
-    public CardHandler(CardService cardService) {
-        this.cardService = cardService;
-    }
-
     public Mono<ServerResponse> getAll(ServerRequest request) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(cardService.getAllCards(), Card.class));
+                .body(BodyInserters.fromPublisher(cardService.getAllCards(), CardDto.class));
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
         var id = request.pathVariable("id");
-        var card = cardService.getCard(id);
+        var card = cardService.getCard(UUID.fromString(id));
         var successResponse = ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(card, Card.class));
+                .body(BodyInserters.fromPublisher(card, CardDto.class));
+
         return card
                 .flatMap(c -> successResponse)
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-     public Mono<ServerResponse> post(ServerRequest request) {
+    public Mono<ServerResponse> post(ServerRequest request) {
         var location = UriComponentsBuilder.fromPath("cards/" + "id").build().toUri();
         var cardRequest = request.bodyToMono(CardCreateRequest.class)
-                .flatMap(c -> cardService.createCard(c.getPersonInfo(), c.getAccessRoles()));
+                .flatMap(cardService::createCard);
+
         return ServerResponse.created(location)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(cardRequest, Card.class));
+                .body(BodyInserters.fromPublisher(cardRequest, CardDto.class));
     }
 
 }

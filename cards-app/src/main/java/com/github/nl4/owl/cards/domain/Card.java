@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Document
 @Data
@@ -15,10 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Card {
+
     @Id
-    private String id;
+    private UUID id;
     private String barcode;
     private PersonInfo personInfo;
     private Set<AccessRoleInfo> accessRoles;
     private String createdBy;
+
 }

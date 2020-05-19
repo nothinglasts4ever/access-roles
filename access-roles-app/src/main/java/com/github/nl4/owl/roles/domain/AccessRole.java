@@ -1,33 +1,36 @@
 package com.github.nl4.owl.roles.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AccessRole implements Serializable {
+
     @Id
-    @GeneratedValue
-    private Long id;
+    private UUID id;
+    @NotNull
     private String personId;
     @ManyToOne
+    @NotNull
     private Location location;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    @NotNull
+    private OffsetDateTime start;
+    @NotNull
+    private OffsetDateTime end;
     private String createdBy;
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
+
 }

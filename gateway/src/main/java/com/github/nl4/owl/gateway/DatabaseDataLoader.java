@@ -3,26 +3,28 @@ package com.github.nl4.owl.gateway;
 import com.github.nl4.owl.gateway.domain.AppUser;
 import com.github.nl4.owl.gateway.domain.Credentials;
 import com.github.nl4.owl.gateway.repo.UserRepository;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Component
-public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+@RequiredArgsConstructor
+public class DatabaseDataLoader {
 
-    private UserRepository userRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public DatabaseDataLoader(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    @EventListener(ApplicationReadyEvent.class)
+    public void onStartup() {
+        createDefaultUsers();
     }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    void createDefaultUsers() {
         var credentials1 = Credentials.builder()
                 .login("Duff123")
                 .password(bCryptPasswordEncoder.encode("secret1"))
@@ -35,22 +37,27 @@ public class DatabaseDataLoader implements ApplicationListener<ContextRefreshedE
                 .login("852")
                 .password(bCryptPasswordEncoder.encode("haha"))
                 .build();
-        var honer = AppUser.builder()
+
+        var homer = AppUser.builder()
+                .id(UUID.randomUUID())
                 .firstName("Homer")
                 .lastName("Simpson")
                 .credentials(credentials1)
                 .build();
         var bart = AppUser.builder()
+                .id(UUID.randomUUID())
                 .firstName("Bart")
                 .lastName("Simpson")
                 .credentials(credentials2)
                 .build();
         var nelson = AppUser.builder()
+                .id(UUID.randomUUID())
                 .firstName("Nelson")
                 .lastName("Muntz")
                 .credentials(credentials3)
                 .build();
-        userRepository.saveAll(Set.of(honer, bart, nelson));
+
+        userRepository.saveAll(Set.of(homer, bart, nelson));
     }
 
 }

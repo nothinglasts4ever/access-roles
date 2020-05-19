@@ -5,7 +5,7 @@ import com.github.nl4.owl.cards.domain.PersonInfo
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class CardUtilTest extends Specification {
 
@@ -25,7 +25,7 @@ class CardUtilTest extends Specification {
                 .accessRoleId(10L)
                 .locationId(1L)
                 .locationName("Gazorpazorp")
-                .expiration(LocalDateTime.now().plusYears(30))
+                .expiration(OffsetDateTime.now().plusYears(30))
                 .build()
     }
 
@@ -35,7 +35,7 @@ class CardUtilTest extends Specification {
                     .accessRoleId(11L)
                     .locationId(2L)
                     .locationName("Cronenberg World")
-                    .expiration(LocalDateTime.now().plusYears(10))
+                    .expiration(OffsetDateTime.now().plusYears(10))
                     .build()
         when:
             def barcode = CardUtil.generateBarcode(rick, [role, role2].toSet())

@@ -1,49 +1,52 @@
 package com.github.nl4.owl.cards.service;
 
-import com.github.nl4.owl.cards.domain.AccessRoleInfo;
+import com.github.nl4.owl.cards.api.CardCreateRequest;
+import com.github.nl4.owl.cards.api.CardDto;
+import com.github.nl4.owl.cards.config.CardMapper;
 import com.github.nl4.owl.cards.domain.Card;
 import com.github.nl4.owl.cards.domain.PersonInfo;
 import com.github.nl4.owl.cards.repo.CardRepository;
 import com.github.nl4.owl.cards.util.CardUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.ValidationException;
-import java.util.Set;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CardService {
 
     private final CardRepository cardRepository;
+    private final CardMapper mapper;
 
-    @Autowired
-    public CardService(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
+    public Flux<CardDto> getAllCards() {
+        return cardRepository.findAll()
+                .map(mapper::toCardDto);
     }
 
-    public Flux<Card> getAllCards() {
-        return cardRepository.findAll();
+    public Mono<CardDto> getCard(UUID id) {
+        return cardRepository.findById(id)
+                .map(mapper::toCardDto);
     }
 
-    public Mono<Card> getCard(String id) {
-        return cardRepository.findById(id);
-    }
-
-    public Mono<Card> createCard(PersonInfo personInfo, Set<AccessRoleInfo> accessRoles) {
-        if (personInfo.getPersonId() == null) {
-            throw new ValidationException("Person id is not specified");
-        }
-        if (accessRoles == null || accessRoles.size() == 0) {
-            throw new ValidationException("Person has no active access roles");
-        }
+    public Mono<CardDto> createCard(CardCreateRequest request) {
+        var accessRoles = mapper.toAccessRoleSet(request.getAccessRoles());
+        var personInfo = PersonInfo.builder()
+                .personId(request.getPersonId())
+                .personName(request.getPersonName())
+                .personDetails(request.getPersonDetails())
+                .build();
         var card = Card.builder()
+                .id(UUID.randomUUID())
                 .personInfo(personInfo)
                 .accessRoles(accessRoles)
                 .barcode(CardUtil.generateBarcode(personInfo, accessRoles))
                 .build();
-        return cardRepository.save(card);
+
+        return cardRepository.save(card)
+                .map(mapper::toCardDto);
     }
 
 }

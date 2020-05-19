@@ -12,8 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address {
+
     private String city;
     private String street;
     private int building;
     private int apartment;
+
 }
