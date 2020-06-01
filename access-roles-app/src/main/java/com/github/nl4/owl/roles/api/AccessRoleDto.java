@@ -16,9 +16,9 @@ public class AccessRoleDto {
     @NotNull
     private LocationDto location;
     @NotNull
-    private OffsetDateTime start;
+    private OffsetDateTime startTime;
     @NotNull
-    private OffsetDateTime end;
+    private OffsetDateTime endTime;
     private String createdBy;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

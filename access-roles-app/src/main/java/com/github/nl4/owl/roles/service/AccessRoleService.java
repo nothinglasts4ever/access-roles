@@ -41,9 +41,8 @@ public class AccessRoleService {
     public AccessRoleDto updateAccessRole(AccessRoleDto accessRole, UUID id) {
         var dbAccessRole = doGetAccessRole(id);
         dbAccessRole.setLocation(mapper.toLocation(accessRole.getLocation()));
-        dbAccessRole.setPersonId(accessRole.getPersonId());
-        dbAccessRole.setStart(accessRole.getStart());
-        dbAccessRole.setEnd(accessRole.getEnd());
+        dbAccessRole.setStartTime(accessRole.getStartTime());
+        dbAccessRole.setEndTime(accessRole.getEndTime());
 
         return mapper.toAccessRoleDto(dbAccessRole);
     }

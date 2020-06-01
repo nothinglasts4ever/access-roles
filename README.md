@@ -69,16 +69,18 @@ Access Roles App      Persons App         Cards App
 
         |                  |                  |
         
-       _.-,               /|\                /|\  
-   .--'  '-._            / |/\              / |/\ 
- _/`-  _      '.        | \|.'|            | \|.'|
-'----'._`.----. \       \'.|/ /            \'.|/ /
-        `     \;         '.|.'              '.|.' 
-      MySQL   ;_\       MongoDb            MongoDb
+        _  _ \            /|\                /|\  
+       ( \--,/)          / |/\              / |/\ 
+   ,---\ ` '_/          | \|.'|            | \|.'|
+  /( ___'--/`           \'.|/ /            \'.|/ /
+   |_|\ |_|\             '.|.'              '.|.' 
+   PostgreSQL           MongoDb            MongoDb
 
 ```
 
 ## Domain Model
+The main goal of this project was to try domain driven design and learn microservices infrastructure.
+Solution itself is about handling passes to access to locations.
 * Persons App
   * Contains information about persons and their addresses
   * Addresses and persons can be added, modified or deleted
