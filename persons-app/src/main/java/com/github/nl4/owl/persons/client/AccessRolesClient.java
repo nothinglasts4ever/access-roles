@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(value = "access-roles-app")
+@FeignClient("access-roles-app")
 public interface AccessRolesClient {
 
     @DeleteMapping("/access-roles")
-    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam UUID personId);
+    ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam("personId") UUID personId);
 
 }

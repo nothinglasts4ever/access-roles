@@ -1,0 +1,11 @@
+db_parameters: authSource=admin&authMechanism=SCRAM-SHA-1
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?${db_parameters}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-discovery:8761/eureka

@@ -1,0 +1,33 @@
+server:
+  port: 8092
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: access-roles-app
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    initialization-mode: always
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+    hibernate:
+      ddl-auto: create
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  topic: access-role
+
+eureka:
+  client:
+    fetchRegistry: true
+
+logging.level.org.apache.kafka.clients: ERROR
+logging.level.org.apache.kafka.common.utils: ERROR
+logging.level.org.springframework.boot.autoconfigure: ERROR

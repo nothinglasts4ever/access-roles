@@ -46,6 +46,7 @@ public class DatabaseDataLoader {
                 .build();
 
         var card = Card.builder()
+                .id(UUID.randomUUID())
                 .barcode(CardUtil.generateBarcode(rick, Set.of(role1, role2)))
                 .personInfo(rick)
                 .accessRoles(Set.of(role1, role2))

@@ -1,0 +1,27 @@
+server:
+  port: 8090
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: persons-app
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    initialization-mode: always
+
+eureka:
+  client:
+    fetchRegistry: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+
+logging.level.com.github.nl4.owl.persons.client.AccessRolesClient: DEBUG
+logging.level.org.springframework.boot.autoconfigure: ERROR

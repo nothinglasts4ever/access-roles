@@ -2,6 +2,7 @@ package com.github.nl4.owl.roles.controller;
 
 import com.github.nl4.owl.roles.api.AccessRoleDto;
 import com.github.nl4.owl.roles.service.AccessRoleService;
+import com.github.nl4.owl.roles.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class AccessRoleController {
 
     private final AccessRoleService accessRolesService;
+    private final MessageService messageService;
 
     @GetMapping
     public ResponseEntity<Collection<AccessRoleDto>> allAccessRoles() {
@@ -34,8 +36,8 @@ public class AccessRoleController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleDto accessRoles, HttpServletRequest request) {
-        var createdAccessRole = accessRolesService.createAccessRole(accessRoles);
+    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleDto accessRole, HttpServletRequest request) {
+        var createdAccessRole = accessRolesService.createAccessRole(accessRole);
         var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/access-roles/{id}")
@@ -46,8 +48,9 @@ public class AccessRoleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccessRole(@PathVariable UUID id, @RequestBody @Valid AccessRoleDto accessRoles) {
-        accessRolesService.updateAccessRole(accessRoles, id);
+    public ResponseEntity<Void> updateAccessRole(@PathVariable UUID id, @RequestBody @Valid AccessRoleDto accessRole) {
+        AccessRoleDto updatedRole = accessRolesService.updateAccessRole(accessRole, id);
+        messageService.sendMessage(id, updatedRole);
         log.info("Access role with id [{}] updated", id);
         return ResponseEntity.noContent().build();
     }

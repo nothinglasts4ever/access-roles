@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev
   application:
     name: gateway-api
   datasource:
@@ -10,14 +12,6 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create
-#    properties:
-#      hibernate:
-#        show_sql: true
-#        use_sql_comments: true
-#        format_sql: true
-  h2:
-    console:
-      enabled: true
 
 zuul:
   ignoredServices: '*'
@@ -41,6 +35,6 @@ zuul:
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://service-discovery:8761/eureka
     fetchRegistry: true
+
+logging.level.org.springframework.boot.autoconfigure: ERROR

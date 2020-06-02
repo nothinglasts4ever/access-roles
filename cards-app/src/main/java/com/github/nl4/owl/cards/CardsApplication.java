@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication(scanBasePackages = {"com.github.nl4.owl.cards", "com.github.nl4.owl.common"})
+@SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
 public class CardsApplication {
