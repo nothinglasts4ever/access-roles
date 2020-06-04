@@ -1,7 +1,9 @@
 package com.github.nl4.owl.roles.controller;
 
 import com.github.nl4.owl.roles.api.LocationDto;
+import com.github.nl4.owl.roles.service.AccessRoleService;
 import com.github.nl4.owl.roles.service.LocationService;
+import com.github.nl4.owl.roles.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import java.util.UUID;
 public class LocationController {
 
     private final LocationService locationService;
+    private final AccessRoleService accessRolesService;
+    private final MessageService messageService;
 
     @GetMapping
     public ResponseEntity<Collection<LocationDto>> allLocations() {
@@ -47,7 +51,8 @@ public class LocationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLocation(@PathVariable UUID id, @RequestBody @Valid LocationDto location) {
-        locationService.updateLocation(location, id);
+        LocationDto updatedLocation = locationService.updateLocation(location, id);
+        messageService.sendLocationUpdated(updatedLocation);
         log.info("Location with id [{}] updated", id);
         return ResponseEntity.noContent().build();
     }
@@ -55,6 +60,8 @@ public class LocationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable UUID id) {
         locationService.deleteLocation(id);
+        accessRolesService.deleteAccessRolesForLocation(id);
+        messageService.sendLocationDeleted(id);
         log.info("Location with id [{}] removed", id);
         return ResponseEntity.noContent().build();
     }

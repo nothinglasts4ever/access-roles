@@ -16,10 +16,13 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: com.github.nl4.owl.common.api
+        spring.json.trusted.packages: com.github.nl4.owl.common.messaging
 
 app:
-  topic: access-role
+  topic:
+    access-role: access-role
+    location: location
+    person: person
 
 eureka:
   client:

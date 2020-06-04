@@ -1,45 +1,58 @@
 package com.github.nl4.owl.cards.messaging;
 
-import com.github.nl4.owl.cards.domain.Card;
-import com.github.nl4.owl.cards.repo.CardRepository;
-import com.github.nl4.owl.common.api.AccessRoleUpdated;
+import com.github.nl4.owl.cards.service.UpdateService;
+import com.github.nl4.owl.common.messaging.MessageType;
+import com.github.nl4.owl.common.messaging.MessagingEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class Consumer {
 
-    private final CardRepository repository;
+    private final UpdateService updateService;
 
-    @KafkaListener(topics = "${app.topic}")
-    public void listen(Message<AccessRoleUpdated> message) throws Exception {
-        AccessRoleUpdated data = message.getPayload();
-        UUID accessRoleId = data.getId();
-        log.info("Received update of access role with id [{}]", accessRoleId);
+    @KafkaListener(topics = "${app.topic.location}")
+    public void listenLocationUpdates(Message<MessagingEvent> message) throws Exception {
+        var data = message.getPayload();
+        var type = data.getType();
+        log.info("Received message [{}] for location [{}]", type, data.getId());
 
-        repository.findAllByAccessRoles_AccessRoleId(accessRoleId)
-                .map(card -> updateRolesInfo(data, accessRoleId, card))
-                .flatMap(repository::save)
-                .subscribe();
+        if (type == MessageType.LOCATION_UPDATED) {
+            updateService.updateCardsWithLocation(data);
+        } else if (type == MessageType.LOCATION_DELETED) {
+            updateService.deleteRolesWithLocation(data);
+        }
     }
 
-    private Card updateRolesInfo(AccessRoleUpdated data, UUID accessRoleId, Card card) {
-        card.getAccessRoles()
-                .stream()
-                .filter(role -> Objects.equals(role.getAccessRoleId(), accessRoleId))
-                .forEach(role -> {
-                    role.setExpiration(data.getEndTime());
-                    role.setLocationName(data.getLocationName());
-                });
-        return card;
+    @KafkaListener(topics = "${app.topic.access-role}")
+    public void listenAccessRoleUpdates(Message<MessagingEvent> message) throws Exception {
+        var data = message.getPayload();
+        var type = data.getType();
+        log.info("Received message [{}] for access role [{}]", type, data.getId());
+
+        if (type == MessageType.ACCESS_ROLE_UPDATED) {
+            updateService.updateCardsWithRoles(data);
+        } else if (type == MessageType.ACCESS_ROLE_DELETED) {
+            updateService.deleteRoles(data);
+        }
+    }
+
+    @KafkaListener(topics = "${app.topic.person}")
+    public void listenPersonUpdates(Message<MessagingEvent> message) throws Exception {
+        var data = message.getPayload();
+        var type = data.getType();
+        log.info("Received message [{}] for person [{}]", type, data.getId());
+
+        if (type == MessageType.PERSON_UPDATED) {
+            updateService.updateCardsForPerson(data);
+        } else if (type == MessageType.PERSON_DELETED) {
+            updateService.deleteCards(data);
+        }
     }
 
 }

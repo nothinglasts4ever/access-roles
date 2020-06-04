@@ -22,7 +22,9 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 app:
-  topic: access-role
+  topic:
+    access-role: access-role
+    location: location
 
 eureka:
   client:
@@ -31,3 +33,4 @@ eureka:
 logging.level.org.apache.kafka.clients: ERROR
 logging.level.org.apache.kafka.common.utils: ERROR
 logging.level.org.springframework.boot.autoconfigure: ERROR
+logging.level.com.netflix.discovery.DiscoveryClient: ERROR

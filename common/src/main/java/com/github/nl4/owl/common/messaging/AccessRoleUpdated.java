@@ -1,16 +1,15 @@
-package com.github.nl4.owl.common.api;
+package com.github.nl4.owl.common.messaging;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class AccessRoleUpdated {
-    private UUID id;
-    private String locationName;
+public class AccessRoleUpdated extends MessagingEvent {
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
 }

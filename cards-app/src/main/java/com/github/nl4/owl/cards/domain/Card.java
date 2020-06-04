@@ -23,5 +23,6 @@ public class Card {
     private PersonInfo personInfo;
     private Set<AccessRoleInfo> accessRoles;
     private String createdBy;
+    private boolean active;
 
 }

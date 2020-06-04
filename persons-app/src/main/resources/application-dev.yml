@@ -4,6 +4,8 @@ spring:
   data:
     mongodb:
       uri: mongodb://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?${db_parameters}
+  kafka:
+    bootstrap-servers: kafka:9092
 
 eureka:
   client:

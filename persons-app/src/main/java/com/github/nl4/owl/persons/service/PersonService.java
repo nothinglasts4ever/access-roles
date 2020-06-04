@@ -2,7 +2,6 @@ package com.github.nl4.owl.persons.service;
 
 import com.github.nl4.owl.persons.api.PersonDto;
 import com.github.nl4.owl.persons.config.PersonMapper;
-import com.github.nl4.owl.persons.domain.Person;
 import com.github.nl4.owl.persons.repo.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,10 +36,13 @@ public class PersonService {
     }
 
     public Mono<PersonDto> updatePerson(PersonDto person, UUID id) {
-        var updatedPerson = mapper.toPerson(person);
-        updatedPerson.setId(id);
-
-        return personRepository.save(updatedPerson)
+        return personRepository.findById(id)
+                .map(p -> {
+                    var updatedPerson = mapper.toPerson(person);
+                    updatedPerson.setId(id);
+                    return updatedPerson;
+                })
+                .flatMap(personRepository::save)
                 .map(mapper::toPersonDto);
     }
 

@@ -10,6 +10,14 @@ spring:
     default-property-inclusion: non_null
   datasource:
     initialization-mode: always
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  topic:
+    person: person
 
 eureka:
   client:
@@ -24,4 +32,7 @@ feign:
         loggerLevel: full
 
 logging.level.com.github.nl4.owl.persons.client.AccessRolesClient: DEBUG
+logging.level.org.apache.kafka.clients: ERROR
+logging.level.org.apache.kafka.common.utils: ERROR
 logging.level.org.springframework.boot.autoconfigure: ERROR
+logging.level.com.netflix.discovery.DiscoveryClient: ERROR

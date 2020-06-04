@@ -21,9 +21,12 @@ public class CardHandler {
     private final CardService cardService;
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
+        var active = request.queryParam("active")
+                .orElse("true");
+
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(cardService.getAllCards(), CardDto.class));
+                .body(BodyInserters.fromPublisher(cardService.getAllCards(Boolean.parseBoolean(active)), CardDto.class));
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
@@ -46,6 +49,13 @@ public class CardHandler {
         return ServerResponse.created(location)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromPublisher(cardRequest, CardDto.class));
+    }
+
+    public Mono<ServerResponse> delete(ServerRequest request) {
+        var id = request.pathVariable("id");
+        return cardService.softDelete(UUID.fromString(id))
+                .flatMap(c -> ServerResponse.noContent().build())
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
 }

@@ -1,4 +1,4 @@
-package com.github.nl4.owl.roles.messaging;
+package com.github.nl4.owl.persons.messaging;
 
 import com.github.nl4.owl.common.messaging.MessagingEvent;
 import lombok.RequiredArgsConstructor;
@@ -12,20 +12,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class Producer {
 
-    @Value("${app.topic.access-role}")
-    private String accessRoleTopic;
-
-    @Value("${app.topic.location}")
-    private String locationTopic;
+    @Value("${app.topic.person}")
+    private String personTopic;
 
     private final KafkaTemplate<String, MessagingEvent> template;
 
-    public void sendToAccessRoleTopic(MessagingEvent message) {
-        sendMessage(message, accessRoleTopic);
-    }
-
-    public void sendToLocationTopic(MessagingEvent message) {
-        sendMessage(message, locationTopic);
+    public void sendToPersonTopic(MessagingEvent message) {
+        sendMessage(message, personTopic);
     }
 
     private void sendMessage(MessagingEvent message, String topic) {

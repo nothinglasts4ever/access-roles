@@ -25,9 +25,9 @@ public class DatabaseDataLoader {
     }
 
     void createPersons() {
-        var address1 = Address.builder().city("Black").street("41st Street").building(234).apartment(2342).build();
-        var address2 = Address.builder().city("Yellow").street("32nd Street").building(123).apartment(9876).build();
-        var address3 = Address.builder().city("Red").street("23rd Street").building(456).apartment(1).build();
+        var address1 = Address.builder().city("Black").street("41st").building(234).apartment(2342).build();
+        var address2 = Address.builder().city("Yellow").street("32nd").building(123).apartment(9876).build();
+        var address3 = Address.builder().city("Red").street("23rd").building(456).apartment(1).build();
 
         var rick = Person.builder()
                 .id(UUID.fromString("9f0011f5-72d6-4275-8555-15e350362828"))

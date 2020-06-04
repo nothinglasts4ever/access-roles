@@ -49,8 +49,9 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 - [x] Implement *authentication* using JSON Web Token
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
-- [ ] Communicate between microservices using **Kafka**
+- [x] Communicate between microservices using **Kafka**
 - [ ] Implement *CQRS* for one microservice
+- [ ] Migrate to Spring Cloud Kubernetes
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
 
 ## Architecture

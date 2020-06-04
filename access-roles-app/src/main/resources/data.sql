@@ -1,3 +1,6 @@
+CREATE UNIQUE INDEX location_unique_name ON location (name) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX access_role_unique_person_location ON access_role (person_id, location_id) WHERE deleted_at IS NULL;
+
 INSERT INTO location (id, name)
 VALUES ('5dda0159-ed5c-44d4-b5f7-efb68ffbe8f8', 'Gazorpazorp');
 INSERT INTO location (id, name)

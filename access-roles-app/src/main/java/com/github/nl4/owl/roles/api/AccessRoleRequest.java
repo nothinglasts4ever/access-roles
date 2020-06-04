@@ -2,19 +2,21 @@ package com.github.nl4.owl.roles.api;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
-public class AccessRoleDto {
+public class AccessRoleRequest {
 
-    private UUID id;
+    @NotBlank
     private UUID personId;
-    private LocationDto location;
+    @NotNull
+    private UUID locationId;
+    @NotNull
     private OffsetDateTime startTime;
+    @NotNull
     private OffsetDateTime endTime;
-    private String createdBy;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
 
 }

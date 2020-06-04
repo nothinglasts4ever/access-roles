@@ -2,6 +2,7 @@ package com.github.nl4.owl.persons.controller;
 
 import com.github.nl4.owl.persons.api.PersonDto;
 import com.github.nl4.owl.persons.client.AccessRolesClient;
+import com.github.nl4.owl.persons.service.MessageService;
 import com.github.nl4.owl.persons.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class PersonController {
 
     private final PersonService personService;
     private final AccessRolesClient accessRolesClient;
+    private final MessageService messageService;
 
     @GetMapping
     public Flux<PersonDto> getAllPersons() {
@@ -46,9 +48,9 @@ public class PersonController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<PersonDto>> updatePerson(@PathVariable UUID id, @RequestBody PersonDto person) {
-        return personService.getPerson(id)
+        return personService.updatePerson(person, id)
                 .map(p -> {
-                    personService.updatePerson(person, id);
+                    messageService.sendPersonUpdated(p);
                     log.info("Person with id [{}] updated", id);
                     return ResponseEntity.ok(person);
                 })
@@ -57,12 +59,14 @@ public class PersonController {
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deletePerson(@PathVariable UUID id) {
-        var deletePerson = personService.deletePerson(id);
-        var deleteRoles = Mono.just(accessRolesClient.deleteAccessRolesForPerson(id));
         return personService.getPerson(id)
-                .flatMap(person -> Mono.zip(deletePerson, deleteRoles)
+                .flatMap(person -> personService.deletePerson(id)
                         .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK)))
-                        .doOnNext(x -> log.info("Person with id [{}] removed", id))
+                        .doOnNext(x -> {
+                            log.info("Person with id [{}] removed", id);
+                            accessRolesClient.deleteAccessRolesForPerson(id);
+                            messageService.sendPersonDeleted(id);
+                        })
                 )
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }

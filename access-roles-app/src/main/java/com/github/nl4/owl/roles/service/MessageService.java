@@ -1,7 +1,8 @@
 package com.github.nl4.owl.roles.service;
 
-import com.github.nl4.owl.common.api.AccessRoleUpdated;
+import com.github.nl4.owl.common.messaging.MessagingEvent;
 import com.github.nl4.owl.roles.api.AccessRoleDto;
+import com.github.nl4.owl.roles.api.LocationDto;
 import com.github.nl4.owl.roles.messaging.Producer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,22 @@ public class MessageService {
 
     private final Producer producer;
 
-    // compare old and new
-    public void sendMessage(UUID id, AccessRoleDto updated) {
-        var message = new AccessRoleUpdated();
-        message.setId(id);
-        message.setLocationName(updated.getLocation() != null ? updated.getLocation().getName() : null);
-        message.setStartTime(updated.getStartTime());
-        message.setEndTime(updated.getEndTime());
-        producer.sendMessage(message);
+    public void sendLocationUpdated(LocationDto location) {
+        var message = MessagingEvent.createLocationUpdatedEvent(location.getId(), location.getName());
+        producer.sendToLocationTopic(message);
+    }
+
+    public void sendLocationDeleted(UUID id) {
+        producer.sendToLocationTopic(MessagingEvent.createLocationDeletedEvent(id));
+    }
+
+    public void sendAccessRoleUpdated(UUID id, AccessRoleDto role) {
+        var message = MessagingEvent.createAccessRoleUpdatedEvent(id, role.getStartTime(), role.getEndTime());
+        producer.sendToAccessRoleTopic(message);
+    }
+
+    public void sendAccessRoleDeleted(UUID id) {
+        producer.sendToAccessRoleTopic(MessagingEvent.createAccessRoleDeletedEvent(id));
     }
 
 }

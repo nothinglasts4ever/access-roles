@@ -1,6 +1,7 @@
 package com.github.nl4.owl.roles.controller;
 
 import com.github.nl4.owl.roles.api.AccessRoleDto;
+import com.github.nl4.owl.roles.api.AccessRoleRequest;
 import com.github.nl4.owl.roles.service.AccessRoleService;
 import com.github.nl4.owl.roles.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class AccessRoleController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleDto accessRole, HttpServletRequest request) {
+    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleRequest accessRole, HttpServletRequest request) {
         var createdAccessRole = accessRolesService.createAccessRole(accessRole);
         var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
@@ -48,9 +49,9 @@ public class AccessRoleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccessRole(@PathVariable UUID id, @RequestBody @Valid AccessRoleDto accessRole) {
-        AccessRoleDto updatedRole = accessRolesService.updateAccessRole(accessRole, id);
-        messageService.sendMessage(id, updatedRole);
+    public ResponseEntity<Void> updateAccessRole(@PathVariable UUID id, @RequestBody @Valid AccessRoleRequest accessRole) {
+        var updatedRole = accessRolesService.updateAccessRole(accessRole, id);
+        messageService.sendAccessRoleUpdated(id, updatedRole);
         log.info("Access role with id [{}] updated", id);
         return ResponseEntity.noContent().build();
     }
@@ -58,12 +59,13 @@ public class AccessRoleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccessRole(@PathVariable UUID id) {
         accessRolesService.deleteAccessRole(id);
+        messageService.sendAccessRoleDeleted(id);
         log.info("Access role with id [{}] removed", id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam String personId) {
+    public ResponseEntity<Void> deleteAccessRolesForPerson(@RequestParam UUID personId) {
         accessRolesService.deleteAccessRolesForPerson(personId);
         log.info("All access roles for person with id [{}] to be removed", personId);
         return ResponseEntity.noContent().build();

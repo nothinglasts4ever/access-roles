@@ -3,13 +3,13 @@ package com.github.nl4.owl.roles.service;
 import com.github.nl4.owl.roles.api.LocationDto;
 import com.github.nl4.owl.roles.config.AccessRoleMapper;
 import com.github.nl4.owl.roles.domain.Location;
-import com.github.nl4.owl.roles.repo.AccessRoleRepository;
 import com.github.nl4.owl.roles.repo.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -18,7 +18,6 @@ import java.util.UUID;
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final AccessRoleRepository accessRoleRepository;
     private final AccessRoleMapper mapper;
 
     @Transactional(readOnly = true)
@@ -49,9 +48,8 @@ public class LocationService {
 
     @Transactional
     public void deleteLocation(UUID id) {
-        doGetLocation(id);
-        accessRoleRepository.deleteAccessRolesByLocation_Id(id);
-        locationRepository.deleteById(id);
+        var location = doGetLocation(id);
+        location.setDeletedAt(OffsetDateTime.now());
     }
 
     private Location doGetLocation(UUID id) {

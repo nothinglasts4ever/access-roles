@@ -20,9 +20,13 @@ public class CardRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON))
                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON));
 
+        var delete = RequestPredicates.DELETE("/cards/{id}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
         return RouterFunctions.route(get, cardHandler::get)
                 .andRoute(getAll, cardHandler::getAll)
-                .andRoute(post, cardHandler::post);
+                .andRoute(post, cardHandler::post)
+                .andRoute(delete, cardHandler::delete);
     }
 
 }

@@ -21,13 +21,13 @@ public class CardService {
     private final CardRepository cardRepository;
     private final CardMapper mapper;
 
-    public Flux<CardDto> getAllCards() {
-        return cardRepository.findAll()
+    public Flux<CardDto> getAllCards(boolean active) {
+        return cardRepository.findAllByActive(active)
                 .map(mapper::toCardDto);
     }
 
     public Mono<CardDto> getCard(UUID id) {
-        return cardRepository.findById(id)
+        return cardRepository.findByIdAndActiveIsTrue(id)
                 .map(mapper::toCardDto);
     }
 
@@ -43,9 +43,20 @@ public class CardService {
                 .personInfo(personInfo)
                 .accessRoles(accessRoles)
                 .barcode(CardUtil.generateBarcode(personInfo, accessRoles))
+                .active(true)
                 .build();
 
         return cardRepository.save(card)
+                .map(mapper::toCardDto);
+    }
+
+    public Mono<CardDto> softDelete(UUID id) {
+        return cardRepository.findByIdAndActiveIsTrue(id)
+                .map(card -> {
+                    card.setActive(false);
+                    return card;
+                })
+                .flatMap(cardRepository::save)
                 .map(mapper::toCardDto);
     }
 
