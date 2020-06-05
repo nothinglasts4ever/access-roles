@@ -102,36 +102,87 @@ Solution itself is about handling passes to access to locations.
   * Used for service discovery
 
 ## REST API
-<details>
-  <summary>Click to expand</summary>
 
-  ### Get all locations and one by id
+<details>
+  <summary>Login</summary>
+  
+  ```
+  POST /login
+  ```
+  Payload:
+  ```
+  {
+      "login": "***",
+      "password": "***"
+  }
+  ```
+</details>
+
+<details>
+  <summary>Register user</summary>
+  
+  ```
+  POST /users/register
+  ```
+  Payload:
+  ```
+  {
+      "firstName": "Homer",
+      "lastName": "Simpson",
+      "login": "***",
+      "password": "***"
+  }
+  ```
+</details>
+
+<details>
+  <summary>Get all locations or one by id</summary>
+  
   ```
   GET /locations
   GET /locations/{id}
-  ``` 
+  ```
+  Response:
   ```
   {
       "id": "5e644a41-50ff-43e5-be85-26d6f9619b6b",
       "name": "Earth"
   }
   ```
-  ### Create location
-  ```
+</details>
+
+<details>
+  <summary>Create location</summary>
+
+  ```  
   POST /locations
+  ```
+  Payload:
+  ```
   {
       "name": "Pluto"
   }
   ```
-  ### Update location
+</details>
+
+<details>
+  <summary>Update location</summary>
+
   ```
   PUT /locations/{id} 
+  ```
+  Payload:
+  ```
   {
       "name": "Gazorpazorp"
   }
   ```
-  ### Delete location
-  ```
+</details>
+
+<details>
+  <summary>Delete location</summary>
+
+  ```  
   DELETE /locations/{id} 
   ```
 </details>
@@ -139,8 +190,11 @@ Solution itself is about handling passes to access to locations.
 <details>
   <summary>Get all access roles or one by id</summary>
   
+  ```
   GET /access-roles
   GET /access-roles/{id}
+  ```
+  Response:
   ```
   {
       "id": "6d4066e8-d471-4fe5-8982-d96e690794d6",
@@ -157,8 +211,11 @@ Solution itself is about handling passes to access to locations.
 
 <details>
   <summary>Create access role</summary>
-  
+
+  ```  
   POST /access-roles
+  ```
+  Payload:
   ```
   {
       "personId": "fd9da139-7bc5-4885-982b-d107732f1cc1",
@@ -172,7 +229,10 @@ Solution itself is about handling passes to access to locations.
 <details>
   <summary>Update access role</summary>
 
+  ```
   PUT /access-roles/{id} 
+  ```
+  Payload:
   ```
   {
       "startTime": "2029-03-21T13:30:37+03:00",
@@ -183,9 +243,170 @@ Solution itself is about handling passes to access to locations.
 
 <details>
   <summary>Delete access role by role id or person id</summary>
-  
+
+  ```  
   DELETE /access-roles/{id}
   DELETE /access-roles?personId={id}
+  ```
+</details>
+
+<details>
+  <summary>Get all persons or one by id</summary>
+  
+  ```
+  GET /persons
+  GET /persons/{id}
+  ```
+  Response:
+  ```
+  {
+      "id": "9f0011f5-72d6-4275-8555-15e350362828",
+      "firstName": "Rick",
+      "lastName": "Sanchez",
+      "gender": "MALE",
+      "birthday": "1950-06-05",
+      "addresses": [
+          {
+              "city": "Yellow",
+              "street": "32nd",
+              "building": 123,
+              "apartment": 9876
+          },
+          {
+              "city": "Black",
+              "street": "41st",
+              "building": 234,
+              "apartment": 2342
+          }
+      ]
+  }
+  ```
+</details>
+
+<details>
+  <summary>Create person</summary>
+
+  ```  
+  POST /persons
+  ```
+  Payload:
+  ```
+  {
+      "firstName": "Morty",
+      "lastName": "Smith",
+      "gender": "MALE",
+      "birthday": "2006-06-05",
+      "addresses": [
+          {
+              "city": "Yellow",
+              "street": "32nd",
+              "building": 123,
+              "apartment": 9876
+          }
+      ]
+  }
+  ```
+</details>
+
+<details>
+  <summary>Update person</summary>
+
+  ```
+  PUT /persons/{id} 
+  ```
+  Payload:
+  ```
+  {
+        "firstName": "Morty",
+        "lastName": "Smith",
+        "gender": "MALE",
+        "birthday": "2006-06-05",
+        "addresses": [
+            {
+                "city": "Black",
+                "street": "41st",
+                "building": 234,
+                "apartment": 2342
+            }
+        ]
+    }
+  ```
+</details>
+
+<details>
+  <summary>Delete person</summary>
+
+  ```  
+  DELETE /persons/{id}
+  ```
+</details>
+
+<details>
+  <summary>Get all cards (active or deleted) or one by id</summary>
+  
+  ```
+  GET /cards
+  GET /cards?active={value}
+  GET /cards/{id}
+  ```
+  Response:
+  ```
+  {
+      "id": "3ab8ea7a-01a9-4dcc-91dd-43a6115f0fca",
+      "barcode": "OWYwMDExZjUtNzJkNi00Mjc1LTg1NTUtMTVlMzUwMzYyODI4OjI6ZjRjZjU1OWYtMjFiZi00ODE4LTgyZDMtMzI5OGZlNDgyZGMwOjU4NGMzMzY1LWJiNGEtNGE3OC1hMmQ2LWQ5YjZkMjU2ZGMxOTozNzNlYTAzMS05M2RhLTQ2ZjAtYjJkMS1lYmY2Zjg1MWRkZDc6NWRkYTAxNTktZWQ1Yy00NGQ0LWI1ZjctZWZiNjhmZmJlOGY4",
+      "personInfo": {
+          "personId": "9f0011f5-72d6-4275-8555-15e350362828",
+          "personName": "Rick Sanchez",
+          "personDetails": "Gender: M, Age: 70, Addresses: [Yellow, 123 32nd st., apt. 9876; Black, 234 41st st., apt. 2342]"
+      },
+      "accessRoles": [
+          {
+              "accessRoleId": "f4cf559f-21bf-4818-82d3-3298fe482dc0",
+              "locationId": "584c3365-bb4a-4a78-a2d6-d9b6d256dc19",
+              "locationName": "Cronenberg World",
+              "expiration": "2030-06-05T17:25:41.262+03:00"
+          },
+          {
+              "accessRoleId": "373ea031-93da-46f0-b2d1-ebf6f851ddd7",
+              "locationId": "5dda0159-ed5c-44d4-b5f7-efb68ffbe8f8",
+              "locationName": "Gazorpazorp",
+              "expiration": "2050-06-05T17:25:41.262+03:00"
+          }
+      ]
+  }
+  ```
+</details>
+
+<details>
+  <summary>Create card</summary>
+
+  ```  
+  POST /cards
+  ```
+  Payload:
+  ```
+  {
+      "personId": "4ab0e982-a990-4e98-8c25-de6e025681a6",
+      "personName": "Morty Smith",
+      "personDetails": "Gender: M, Age: 14, Addresses: [Yellow, 123 32nd st., apt. 9876]",
+      "accessRoles": [
+          {
+              "accessRoleId": "4525b0a4-00ed-4779-aa09-24d920d53494",
+              "locationId": "5e644a41-50ff-43e5-be85-26d6f9619b6b",
+              "locationName": "Earth",
+              "expiration": "2040-06-05T17:25:41.262+03:00"
+          }
+      ]
+  }
+  ```
+</details>
+
+<details>
+  <summary>Delete card</summary>
+
+  ```  
+  DELETE /cards/{id}
+  ```
 </details>
 
 ## Implementation Details
