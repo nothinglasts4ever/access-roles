@@ -136,6 +136,58 @@ Solution itself is about handling passes to access to locations.
   ```
 </details>
 
+<details>
+  <summary>Get all access roles or one by id</summary>
+  
+  GET /access-roles
+  GET /access-roles/{id}
+  ```
+  {
+      "id": "6d4066e8-d471-4fe5-8982-d96e690794d6",
+      "personId": "fd9da139-7bc5-4885-982b-d107732f1cc1",
+      "location": {
+          "id": "5e644a41-50ff-43e5-be85-26d6f9619b6b",
+          "name": "Earth"
+      },
+      "startTime": "2019-03-21T13:30:37+03:00",
+      "endTime": "2069-03-21T13:30:37+03:00"
+  }
+  ```
+</details>
+
+<details>
+  <summary>Create access role</summary>
+  
+  POST /access-roles
+  ```
+  {
+      "personId": "fd9da139-7bc5-4885-982b-d107732f1cc1",
+      "locationId": "5e644a41-50ff-43e5-be85-26d6f9619b6b",
+      "startTime": "2019-03-21T13:30:37+03:00",
+      "endTime": "2069-03-21T13:30:37+03:00"
+  }
+  ```
+</details>
+
+<details>
+  <summary>Update access role</summary>
+
+  PUT /access-roles/{id} 
+  ```
+  {
+      "startTime": "2029-03-21T13:30:37+03:00",
+      "endTime": "2069-03-21T13:30:37+03:00"
+  }
+  ```
+</details>
+
+<details>
+  <summary>Delete access role by role id or person id</summary>
+  
+  DELETE /access-roles/{id}
+  DELETE /access-roles?personId={id}
+</details>
+
 ## Implementation Details
 ### Simple domain model using Spring Data and Lombok
 ```java
