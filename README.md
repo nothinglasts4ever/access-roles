@@ -16,7 +16,7 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 ## Stack
 **Note**
 >This project was created prior to my experience in microservice architecture
->and uses frameworks and technologies that I decided to learn by that time.
+>and it uses frameworks and technologies that I decided to learn by that time.
 >
 >It does NOT use modern Spring Cloud stack, does NOT build around Kubernetes
 >and does NOT use ready Access Management solution like Keycloak.
@@ -29,7 +29,7 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 * Zuul
 * Feign
 * JWT
-* MySQL and MongoDB
+* PostgreSQL and MongoDB
 * Groovy and Spock
 * Maven
 * Docker with docker-compose
@@ -38,7 +38,7 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 ## To Do List
 - [x] Simple *domain model* using **Spring Data** and **Lombok**
 - [x] **Spring MVC** *REST* controller
-- [x] Introduce **Docker** and put **MySQL** in separate container
+- [x] Introduce **Docker** and put database into separate container
 - [x] *Service discovery* using **Eureka** in separate container
 - [x] Split domain model and put to different containers
 - [x] Communication between *microservices* using **Feign**
@@ -47,9 +47,10 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 - [x] *Unit tests* using **Groovy Spock**
 - [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
 - [x] Implement *authentication* using JSON Web Token
+- [x] Split configuration into dev and local profiles
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
-- [x] Communicate between microservices using **Kafka**
+- [x] Add communication between microservices using **Kafka**
 - [ ] Implement *CQRS* for one microservice
 - [ ] Migrate to Spring Cloud Kubernetes
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
@@ -100,28 +101,67 @@ Solution itself is about handling passes to access to locations.
 * Service Discovery App
   * Used for service discovery
 
-## Details
+## REST API
+<details>
+  <summary>Click to expand</summary>
+
+  ### Get all locations and one by id
+  ```
+  GET /locations
+  GET /locations/{id}
+  ``` 
+  ```
+  {
+      "id": "5e644a41-50ff-43e5-be85-26d6f9619b6b",
+      "name": "Earth"
+  }
+  ```
+  ### Create location
+  ```
+  POST /locations
+  {
+      "name": "Pluto"
+  }
+  ```
+  ### Update location
+  ```
+  PUT /locations/{id} 
+  {
+      "name": "Gazorpazorp"
+  }
+  ```
+  ### Delete location
+  ```
+  DELETE /locations/{id} 
+  ```
+</details>
+
+## Implementation Details
 ### Simple domain model using Spring Data and Lombok
 ```java
 @Entity
+@Where(clause = "deleted_at IS NULL")
 @Data
-public class AccessRole implements Serializable {
+public class AccessRole {
     @Id
     private UUID id;
+
     @NotNull
-    private String personId;
+    private UUID personId;
     @ManyToOne
     @NotNull
     private Location location;
     @NotNull
-    private OffsetDateTime start;
+    private OffsetDateTime startTime;
     @NotNull
-    private OffsetDateTime end;
+    private OffsetDateTime endTime;
+
     private String createdBy;
     @CreationTimestamp
     private OffsetDateTime createdAt;
     @UpdateTimestamp
     private OffsetDateTime updatedAt;
+    private OffsetDateTime deletedAt;
 }
 ```
 
@@ -148,8 +188,8 @@ public class AccessRoleController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleDto accessRoles, HttpServletRequest request) {
-        var createdAccessRole = accessRolesService.createAccessRole(accessRoles);
+    public ResponseEntity<Void> createAccessRole(@RequestBody @Valid AccessRoleRequest accessRole, HttpServletRequest request) {
+        var createdAccessRole = accessRolesService.createAccessRole(accessRole);
         var uri = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path("/access-roles/{id}")
@@ -161,42 +201,45 @@ public class AccessRoleController {
 
 }
 ```
-### Introduce Docker and put MySQL in separate container
+### Introduce Docker and put database into separate container
 ```
 FROM openjdk:13-alpine
 COPY target/*.jar app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ```
 ```yaml
-  access-roles-mysql:
-    container_name: access-roles-mysql
-    image: mysql:8.0.15
-    command: --default-authentication-plugin=mysql_native_password
-    ports:
-      - 3308:3306
-    expose:
-      - 3306
+  access-roles-postgresql:
+    container_name: access-roles-postgresql
+    image: postgres:12
     environment:
-      MYSQL_DATABASE: access_roles
-      MYSQL_USER: ***
-      MYSQL_PASSWORD: ***
-      MYSQL_ROOT_PASSWORD: ***
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=access_roles
+    ports:
+      - 5432:5432
+    volumes:
+      - /tmp/owl/access-roles-postgresql:/var/lib/postgresql/data
+    restart: on-failure
 
   access-roles-app:
     container_name: access-roles-app
     build:
       context: access-roles-app
       dockerfile: Dockerfile
-    ports:
-      - 8080:8080
     depends_on:
-      - access-roles-mysql
+      - service-discovery
+      - access-roles-postgresql
     environment:
-      - DATABASE_HOST=access-roles-mysql
-      - DATABASE_PORT=3306
+      - DATABASE_HOST=access-roles-postgresql
+      - DATABASE_PORT=5432
       - DATABASE_NAME=access_roles
-      - DATABASE_USER=***
+      - DATABASE_USER=user
       - DATABASE_PASSWORD=***
+    volumes:
+      - /tmp/owl/access-roles-app:/app
+    restart: on-failure
+    links:
+      - service-discovery
 ```
 ### Service discovery using Eureka in separate container
 ```java
@@ -218,6 +261,12 @@ eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+```
+```yaml
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-discovery:8761/eureka
 ```
 ### Communication between microservices using Feign
 ```java
@@ -288,9 +337,13 @@ public class CardRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON))
                 .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON));
 
+        var delete = RequestPredicates.DELETE("/cards/{id}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
         return RouterFunctions.route(get, cardHandler::get)
                 .andRoute(getAll, cardHandler::getAll)
-                .andRoute(post, cardHandler::post);
+                .andRoute(post, cardHandler::post)
+                .andRoute(delete, cardHandler::delete);
     }
 }
 ```
@@ -302,9 +355,12 @@ public class CardHandler {
     private final CardService cardService;
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
+        var active = request.queryParam("active")
+                .orElse("true");
+
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(cardService.getAllCards(), CardDto.class));
+                .body(BodyInserters.fromPublisher(cardService.getAllCards(Boolean.parseBoolean(active)), CardDto.class));
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
@@ -329,6 +385,13 @@ public class CardHandler {
                 .body(BodyInserters.fromPublisher(cardRequest, CardDto.class));
     }
 
+    public Mono<ServerResponse> delete(ServerRequest request) {
+        var id = request.pathVariable("id");
+        return cardService.softDelete(UUID.fromString(id))
+                .flatMap(c -> ServerResponse.noContent().build())
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
 }
 ```
 ### Unit tests using Groovy Spock
@@ -343,25 +406,25 @@ class CardUtilTest extends Specification {
 
     def setup() {
         rick = PersonInfo.builder()
-                .personId("1")
+                .personId(UUID.fromString("9f0011f5-72d6-4275-8555-15e350362828"))
                 .personName("Rick Sanchez")
-                .personDetails("Gender: M, Age: 70")
+                .personDetails(CardUtil.composePersonDetails(Gender.MALE, LocalDate.now().minusYears(70), null))
                 .build()
         role = AccessRoleInfo.builder()
-                .accessRoleId(10L)
-                .locationId(1L)
+                .accessRoleId(UUID.fromString("373ea031-93da-46f0-b2d1-ebf6f851ddd7"))
+                .locationId(UUID.fromString("5dda0159-ed5c-44d4-b5f7-efb68ffbe8f8"))
                 .locationName("Gazorpazorp")
-                .expiration(LocalDateTime.now().plusYears(30))
+                .expiration(OffsetDateTime.now().plusYears(30))
                 .build()
     }
 
     def "Barcode generated correctly when all required values are present"() {
         given:
             def role2 = AccessRoleInfo.builder()
-                    .accessRoleId(11L)
-                    .locationId(2L)
+                    .accessRoleId(UUID.fromString("f4cf559f-21bf-4818-82d3-3298fe482dc0"))
+                    .locationId(UUID.fromString("584c3365-bb4a-4a78-a2d6-d9b6d256dc19"))
                     .locationName("Cronenberg World")
-                    .expiration(LocalDateTime.now().plusYears(10))
+                    .expiration(OffsetDateTime.now().plusYears(10))
                     .build()
         when:
             def barcode = CardUtil.generateBarcode(rick, [role, role2].toSet())
@@ -449,4 +512,77 @@ zuul:
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
+```
+### Split configuration into dev and local profiles
+```yaml
+spring:
+  profiles:
+    active: dev 
+```
+### Add communication between microservices using Kafka
+```yaml
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: cards-app
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.github.nl4.owl.common.messaging
+app:
+  topic:
+    access-role: access-role
+    location: location
+    person: person
+```
+```java
+@Service
+@RequiredArgsConstructor
+public class Producer {
+
+    @Value("${app.topic.person}")
+    private String personTopic;
+
+    private final KafkaTemplate<String, MessagingEvent> template;
+
+    public void sendToPersonTopic(MessagingEvent message) {
+        sendMessage(message, personTopic);
+    }
+
+    private void sendMessage(MessagingEvent message, String topic) {
+        var msg = MessageBuilder.withPayload(message)
+                .setHeader(KafkaHeaders.TOPIC, topic)
+                .build();
+
+        template.send(msg);
+    }
+
+}
+```
+```java
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class Consumer {
+
+    private final UpdateService updateService;
+
+    @KafkaListener(topics = "${app.topic.person}")
+    public void listenPersonUpdates(Message<MessagingEvent> message) throws Exception {
+        var data = message.getPayload();
+        var type = data.getType();
+        log.info("Received message [{}] for person [{}]", type, data.getId());
+
+        if (type == MessageType.PERSON_UPDATED) {
+            updateService.updateCardsForPerson(data);
+        } else if (type == MessageType.PERSON_DELETED) {
+            updateService.deleteCards(data);
+        }
+    }
+
+}
 ```
