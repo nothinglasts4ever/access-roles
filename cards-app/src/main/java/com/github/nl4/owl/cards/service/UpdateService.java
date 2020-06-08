@@ -111,8 +111,13 @@ public class UpdateService {
                 .stream()
                 .filter(role -> !Objects.equals(role.getAccessRoleId(), id))
                 .collect(Collectors.toSet());
-        card.setAccessRoles(roles);
-        card.setBarcode(CardUtil.generateBarcode(card.getPersonInfo(), card.getAccessRoles()));
+
+        if (roles.size() > 0) {
+            card.setAccessRoles(roles);
+            card.setBarcode(CardUtil.generateBarcode(card.getPersonInfo(), card.getAccessRoles()));
+        } else {
+            card.setActive(false);
+        }
         return card;
     }
 

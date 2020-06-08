@@ -38,21 +38,21 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 ## To Do List
 - [x] Simple *domain model* using **Spring Data** and **Lombok**
 - [x] **Spring MVC** *REST* controller
-- [x] Introduce **Docker** and put database into separate container
+- [x] Introduce **Docker** and put *database* into separate container
 - [x] *Service discovery* using **Eureka** in separate container
-- [x] Split domain model and put to different containers
+- [x] Split *domain model* and put to different *containers*
 - [x] Communication between *microservices* using **Feign**
 - [x] Refactor one service to use **MongoDB** and **Spring Reactive WebFlux**
-- [x] Add new microservice with WebFlux controller in *functional style*
+- [x] Add new *microservice* with **WebFlux** controller in *functional style*
 - [x] *Unit tests* using **Groovy Spock**
 - [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
-- [x] Implement *authentication* using JSON Web Token
-- [x] Split configuration into dev and local profiles
+- [x] Implement *authentication* using *JSON Web Token*
+- [x] Split configuration into dev and local *profiles*
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
 - [x] Add communication between microservices using **Kafka**
 - [ ] Implement *CQRS* for one microservice
-- [ ] Migrate to Spring Cloud Kubernetes
+- [ ] Migrate to **Spring Cloud Kubernetes**
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
 
 ## Architecture
@@ -80,9 +80,16 @@ Access Roles App      Persons App         Cards App
 
 ```
 
-## Domain Model
+## Description
 The main goal of this project was to try domain driven design and learn microservices infrastructure.
 Solution itself is about handling passes to access to locations.
+Admin can provide access roles for particular persons to access to particular locations for concrete time period.
+Only period can be changed or role be deactivated.
+Card with barcode and other info is composed based on the access roles for person and can be used to pass the doors. 
+All the changes in locations (name), access roles (period) and personal information are reflected in cards, barcode be re-generated.
+If person deleted or all the access roles deactivated - card be disabled.
+
+## Domain Model
 * Persons App
   * Contains information about persons and their addresses
   * Addresses and persons can be added, modified or deleted
@@ -115,6 +122,10 @@ Solution itself is about handling passes to access to locations.
       "login": "***",
       "password": "***"
   }
+  ```
+  Add *Authorization* header with the returned token for subsequent requests:
+  ```
+  Bearer ***
   ```
 </details>
 
@@ -584,15 +595,15 @@ public interface PersonRepository extends ReactiveMongoRepository<Person, UUID> 
 }
 ```
 ```java
-    @PostMapping
-    public Mono<ResponseEntity<PersonDto>> createPerson(@RequestBody PersonDto person) {
-        return personService.createPerson(person)
-                .map(p -> {
-                    log.info("Person with id [{}] created", p.getId());
-                    return new ResponseEntity<>(p, HttpStatus.CREATED);
-                })
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+@PostMapping
+public Mono<ResponseEntity<PersonDto>> createPerson(@RequestBody PersonDto person) {
+    return personService.createPerson(person)
+            .map(p -> {
+                log.info("Person with id [{}] created", p.getId());
+                return new ResponseEntity<>(p, HttpStatus.CREATED);
+            })
+            .defaultIfEmpty(ResponseEntity.notFound().build());
+}
 ```
 ### Add new microservice with WebFlux controller in functional style
 ```java
@@ -775,16 +786,30 @@ zuul:
 ```
 ### Implement authentication using JSON Web Token
 ```java
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http.cors()
+            .and()
+            .csrf().disable()
+            .authorizeRequests()
+            .antMatchers("/login").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+            .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+}
+```
+To login to the system use *POST /login* endpoint with the following payload:
+```json
+{
+    "login": "***",
+    "password": "***"
+}
+```
+Add *Authorization* header with the returned token for subsequent requests:
+```
+Bearer ***
 ```
 ### Split configuration into dev and local profiles
 ```yaml
