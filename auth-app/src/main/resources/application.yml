@@ -1,0 +1,29 @@
+server:
+  port: 8084
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: auth-app
+  datasource:
+    url: jdbc:h2:mem:default
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+
+security:
+  oauth2:
+    client:
+      client-id: client
+      client-secret: 53cr3t
+    authorization:
+      jwt:
+        key-value: s1gn1ngK3y
+
+eureka:
+  client:
+    fetchRegistry: true
+
+logging.level.org.springframework.boot.autoconfigure: ERROR

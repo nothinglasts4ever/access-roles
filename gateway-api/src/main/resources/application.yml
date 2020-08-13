@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateway-api
+
+security:
+  oauth2:
+    client:
+      client-id: client
+      client-secret: 53cr3t
+    resource:
+      jwt:
+        key-value: s1gn1ngK3y
+
+zuul:
+  ignoredServices: '*'
+  routes:
+    access-roles:
+      path: /access-roles/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    locations:
+      path: /locations/**
+      serviceId: access-roles-app
+      stripPrefix: false
+    persons:
+      path: /persons/**
+      serviceId: persons-app
+      stripPrefix: false
+    cards:
+      path: /cards/**
+      serviceId: cards-app
+      stripPrefix: false
+    register:
+      path: /users/**
+      serviceId: auth-app
+      stripPrefix: false
+    oauth:
+      path: /oauth/**
+      serviceId: auth-app
+      stripPrefix: false
+
+eureka:
+  client:
+    fetchRegistry: true
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        boot:
+          autoconfigure: ERROR

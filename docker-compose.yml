@@ -123,7 +123,7 @@ services:
   gateway-api:
     container_name: gateway-api
     build:
-      context: gateway
+      context: gateway-api
       dockerfile: Dockerfile
     ports:
       - 8080:8080
@@ -131,6 +131,17 @@ services:
       - 8080
     volumes:
       - /tmp/owl/gateway-api:/app
+    restart: on-failure
+    links:
+      - service-discovery
+
+  auth-app:
+    container_name: auth-app
+    build:
+      context: auth-app
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/owl/gauth-app:/app
     restart: on-failure
     links:
       - service-discovery
@@ -149,8 +160,6 @@ services:
       - 9092
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
-#      use for local deployment:
-#      KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /tmp/owl/kafka/docker.sock:/var/run/docker.sock

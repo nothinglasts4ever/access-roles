@@ -7,6 +7,7 @@
     <artifactId>parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
+    <name>owl</name>
 
     <properties>
         <revision>0.4-SNAPSHOT</revision>
@@ -29,7 +30,8 @@
     <modules>
         <module>common</module>
         <module>eureka</module>
-        <module>gateway</module>
+        <module>auth-app</module>
+        <module>gateway-api</module>
         <module>persons-app</module>
         <module>access-roles-app</module>
         <module>cards-app</module>
