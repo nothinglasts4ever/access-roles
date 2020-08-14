@@ -30,6 +30,7 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 * Feign
 * JWT
 * PostgreSQL and MongoDB
+* Apache Kafka
 * Groovy and Spock
 * Maven
 * Docker with docker-compose
@@ -48,20 +49,21 @@ Pet (that's why owl) project to play with microservices infrastructure built usi
 - [x] Add *API gateway* service using *Spring Cloud Gateway* or *Zuul*
 - [x] Implement *authentication* using *JSON Web Token*
 - [x] Split configuration into dev and local *profiles*
+- [x] Decouple *authorization server* to separate microservice
 - [ ] *Frontend* using **React/Redux** and **Webpack**
 - [ ] **Spring MVC Test**
-- [x] Add communication between microservices using **Kafka**
+- [x] Add communication between microservices using **Apache Kafka**
 - [ ] Implement *CQRS* for one microservice
 - [ ] Migrate to **Spring Cloud Kubernetes**
 - [ ] Tune Spring (investigate *modularity*, *AppCDS* and maven dependencies) and JVM 
 
 ## Architecture
 ```
-                ,_,                ,_,
-               (^,^) - H2         (^,^)
-               (   )              (   )
-              --"-"--            --"-"--
-         Gateway API & Auth  Service Discovery
+       ,_,                ,_,                ,_,  
+      (^,^)              (^,^) - H2         (^,^)  
+      (   )              (   )              (   )
+     --"-"--            --"-"--            --"-"--  
+   Gateway API        Auth Server     Service Discovery
   
        ,_,                ,_,                ,_,  
       (.,.)              (O,O)              (-,-)  
@@ -767,19 +769,19 @@ class CardUtilTest extends Specification {
 zuul:
   ignoredServices: '*'
   routes:
-    access-roles-app:
+    access-roles:
       path: /access-roles/**
       serviceId: access-roles-app
       stripPrefix: false
-    locations-app:
+    locations:
       path: /locations/**
       serviceId: access-roles-app
       stripPrefix: false
-    persons-app:
+    persons:
       path: /persons/**
       serviceId: persons-app
       stripPrefix: false
-    cards-app:
+    cards:
       path: /cards/**
       serviceId: cards-app
       stripPrefix: false
@@ -817,7 +819,7 @@ spring:
   profiles:
     active: dev 
 ```
-### Add communication between microservices using Kafka
+### Add communication between microservices using Apache Kafka
 ```yaml
 spring:
   kafka:
@@ -883,4 +885,27 @@ public class Consumer {
     }
 
 }
+```
+### Decouple authorization server to separate microservice
+Auth server config:
+```yaml
+security:
+  oauth2:
+    client:
+      client-id: client
+      client-secret: 53cr3t
+    authorization:
+      jwt:
+        key-value: s1gn1ngK3y
+```
+Gateway API (as a resource server) config:
+```yaml
+security:
+  oauth2:
+    client:
+      client-id: client
+      client-secret: 53cr3t
+    resource:
+      jwt:
+        key-value: s1gn1ngK3y
 ```
